@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Sanación 11.11 - Generador PDF</title>
+<title>Sanación 11.11</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
     font-family: Arial;
-    background: #fbe4ec;
+    background: #f9e6ee;
     padding: 20px;
 }
 .container {
@@ -23,7 +23,7 @@ input, select, textarea {
 button {
     padding: 12px;
     width: 100%;
-    background: #a64ca6;
+    background: #8e3a8e;
     color: white;
     border: none;
     cursor: pointer;
@@ -35,32 +35,18 @@ button {
 
 <div class="container">
 
-<h2>Generador de Informe</h2>
+<h2>Sanación 11.11 - Informe Premium</h2>
 
 <input id="nombre" placeholder="Nombre del consultante">
 
 <select id="intro">
-<option>Durante la sesión se exploró el estado energético actual, identificando bloqueos importantes.</option>
-<option>En esta lectura se observó cómo tu energía se encontraba en el presente y su proyección futura.</option>
-<option>La sesión permitió acceder a información profunda sobre tu estado energético actual.</option>
-<option>Se realizó una lectura evolutiva para comprender el origen de lo que hoy estás sintiendo.</option>
-<option>Se identificaron patrones energéticos que estaban generando desequilibrio.</option>
+<option>Durante la sesión se identificaron bloqueos energéticos que estaban afectando tu equilibrio.</option>
+<option>Se accedió a información profunda sobre tu estado energético actual.</option>
+<option>La lectura permitió comprender el origen de lo que estás sintiendo.</option>
 </select>
 
-<input id="signo" placeholder="Signo (Ej: Aries - Presente)">
-<textarea id="diagnostico" placeholder="Diagnóstico / interpretación"></textarea>
-
-<h4>Sanación detectada</h4>
-<label><input type="checkbox" value="Mal de ojo"> Mal de ojo</label><br>
-<label><input type="checkbox" value="Envidia"> Envidia</label><br>
-<label><input type="checkbox" value="Bajo astral"> Bajo astral</label><br>
-<label><input type="checkbox" value="Conectores"> Conectores</label><br>
-<label><input type="checkbox" value="Desencarnados"> Desencarnados</label><br>
-
-<h4>Chakras trabajados</h4>
-<label><input type="checkbox" value="Corazón"> Corazón</label><br>
-<label><input type="checkbox" value="Tercer ojo"> Tercer ojo</label><br>
-<label><input type="checkbox" value="Corona"> Corona</label><br>
+<input id="signo" placeholder="Zona / Signo">
+<textarea id="diagnostico" placeholder="Interpretación"></textarea>
 
 <input id="bovisInicial" placeholder="Bovis inicial">
 <input id="bovisFinal" placeholder="Bovis final">
@@ -71,8 +57,6 @@ button {
 <option>Cuando sanás tu pasado, tu presente florece y tu futuro se abre con luz.</option>
 <option>Todo lo que liberás hoy, deja espacio para lo nuevo.</option>
 <option>Tu energía en equilibrio es tu mayor poder.</option>
-<option>Sanar es recordar quién sos sin cargas.</option>
-<option>Lo que hoy comprendés, mañana deja de doler.</option>
 </select>
 
 <button onclick="generarPDF()">Generar PDF</button>
@@ -90,59 +74,72 @@ async function generarPDF() {
     let diagnostico = document.getElementById("diagnostico").value;
     let conclusion = document.getElementById("conclusion").value;
     let frase = document.getElementById("frase").value;
-
     let bovisInicial = document.getElementById("bovisInicial").value;
     let bovisFinal = document.getElementById("bovisFinal").value;
 
-    let sanaciones = [];
-    document.querySelectorAll('input[type=checkbox]:checked').forEach(el => {
-        sanaciones.push(el.value);
-    });
+    let y = 25;
 
-    doc.setFont("Helvetica");
+    // HEADER
+    doc.setFillColor(142, 58, 142);
+    doc.rect(0, 0, 210, 30, "F");
 
-    let y = 10;
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(16);
+    doc.text("Sanación 11.11", 10, 15);
 
-    doc.text("Informe de Sanación Energética", 10, y);
+    doc.setFontSize(10);
+    doc.text("Informe energético personalizado", 10, 22);
+
+    doc.setTextColor(0,0,0);
+
+    // BLOQUE FUNCION
+    function bloque(titulo, contenido) {
+        doc.setFillColor(245, 220, 230);
+        doc.rect(10, y-5, 190, 20, "F");
+
+        doc.setFont(undefined, "bold");
+        doc.text(titulo, 12, y);
+
+        doc.setFont(undefined, "normal");
+        doc.text(contenido, 12, y+6, { maxWidth: 180 });
+
+        y += 22;
+    }
+
+    // NOMBRE
+    doc.setFont(undefined, "bold");
+    doc.text("Consultante: " + nombre, 10, y);
     y += 10;
 
-    doc.text("Nombre: " + nombre, 10, y);
+    // BLOQUES
+    bloque("Síntesis", intro);
+    bloque("Lectura Evolutiva", signo + " - " + diagnostico);
+    bloque("Nivel Energético (Bovis)", "Inicial: " + bovisInicial + " | Final: " + bovisFinal);
+    bloque("Conclusión", conclusion);
+
+    // FRASE DESTACADA
+    doc.setFont(undefined, "italic");
+    doc.setFontSize(11);
+    doc.text('"' + frase + '"', 20, y+10, { maxWidth: 170 });
+    y += 20;
+
+    // FOOTER
+    doc.setDrawColor(180,180,180);
+    doc.line(10, y, 200, y);
+
     y += 10;
 
-    doc.text(intro, 10, y, { maxWidth: 180 });
-    y += 15;
-
-    doc.text("Lectura Evolutiva:", 10, y);
-    y += 7;
-    doc.text(signo, 10, y);
-    y += 7;
-    doc.text(diagnostico, 10, y, { maxWidth: 180 });
-    y += 15;
-
-    doc.text("Sanación detectada:", 10, y);
-    y += 7;
-    doc.text(sanaciones.join(", "), 10, y, { maxWidth: 180 });
-    y += 15;
-
-    doc.text("Nivel energético (Bovis):", 10, y);
-    y += 7;
-    doc.text("Inicial: " + bovisInicial, 10, y);
-    y += 7;
-    doc.text("Final: " + bovisFinal, 10, y);
-    y += 15;
-
-    doc.text("Conclusión:", 10, y);
-    y += 7;
-    doc.text(conclusion, 10, y, { maxWidth: 180 });
-    y += 20;
-
-    doc.text(frase, 10, y, { maxWidth: 180 });
-    y += 20;
-
+    doc.setFont(undefined, "normal");
     doc.text("Con amor,", 10, y);
-    y += 7;
+
+    y += 6;
+
+    doc.setFont(undefined, "bold");
     doc.text("Clara – Sanación 11.11", 10, y);
-    y += 7;
+
+    y += 6;
+
+    doc.setFont(undefined, "normal");
     doc.text("+54 9 223 593-1151", 10, y);
 
     doc.save(nombre + "_informe.pdf");
