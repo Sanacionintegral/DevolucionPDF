@@ -1,168 +1,202 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <title>Generador Sanación 11.11 - Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --oro: #c5a059;
+            --purpura: #4a1e4a;
+            --crema: #fdfaf6;
+        }
 
-<style>
-body {
-    font-family: 'Georgia', serif;
-    background: #f7e4ec;
-    padding: 20px;
-}
+        body { font-family: 'Montserrat', sans-serif; background: #ececec; padding: 40px; }
+        .admin-panel { max-width: 600px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
+        
+        h2 { color: var(--purpura); font-family: 'Cinzel', serif; text-align: center; border-bottom: 2px solid var(--oro); padding-bottom: 10px; }
+        
+        input, textarea, select { 
+            width: 100%; margin-bottom: 15px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Montserrat', sans-serif;
+            box-sizing: border-box;
+        }
 
-input, textarea, select {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 8px;
-}
+        button { 
+            width: 100%; padding: 15px; background: var(--purpura); color: white; border: none; 
+            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        button:hover { background: #632a63; transform: translateY(-2px); }
 
-button {
-    width: 100%;
-    padding: 12px;
-    background: #7a2c7a;
-    color: white;
-    border: none;
-}
+        /* DISEÑO PDF A4 */
+        #pdf-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm;
+            background: var(--crema);
+            position: absolute;
+            left: -9999px; /* Oculto */
+            box-sizing: border-box;
+            color: #333;
+        }
 
-/* DISEÑO PDF */
-#pdf {
-    width: 800px;
-    padding: 50px;
-    background: linear-gradient(#fff0f5, #ffffff);
-}
+        /* Marco Dorado */
+        .border-frame {
+            border: 3px solid var(--oro);
+            padding: 15mm;
+            height: 250mm;
+            position: relative;
+            background: white;
+        }
 
-h1 {
-    color: #7a2c7a;
-    text-align: center;
-}
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 32px; letter-spacing: 3px; }
+        .header p { color: var(--oro); text-transform: uppercase; letter-spacing: 2px; font-size: 12px; font-weight: 600; }
 
-.section {
-    background: white;
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 10px;
-}
+        .section { margin-bottom: 20px; line-height: 1.6; }
+        .section-title { 
+            font-family: 'Cinzel', serif; color: var(--purpura); 
+            border-bottom: 1px solid var(--oro); margin-bottom: 10px; font-weight: bold;
+        }
 
-.title {
-    font-weight: bold;
-    color: #7a2c7a;
-    margin-bottom: 10px;
-}
+        /* Estilo Bovis */
+        .bovis-box {
+            display: flex;
+            justify-content: space-around;
+            background: #f9f4f9;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid var(--oro);
+        }
 
-.quote {
-    text-align: center;
-    font-style: italic;
-    margin-top: 30px;
-}
-</style>
+        .bovis-item span { display: block; font-size: 10px; text-transform: uppercase; color: #777; }
+        .bovis-item b { font-size: 18px; color: var(--purpura); }
+
+        .footer { margin-top: 50px; text-align: center; }
+        .signature { font-family: 'Great Vibes', cursive; font-size: 28px; color: var(--purpura); margin-bottom: 5px; }
+        .contact { font-size: 11px; color: #888; }
+        
+        .quote-box {
+            margin-top: 30px;
+            font-style: italic;
+            text-align: center;
+            color: var(--purpura);
+            padding: 0 40px;
+        }
+    </style>
 </head>
-
 <body>
 
-<h2>Generador Nivel Dios</h2>
+<div class="admin-panel">
+    <h2>Sanación 11.11 - Editor</h2>
+    <input id="nombre" placeholder="Nombre completo del consultante">
+    <textarea id="lectura" placeholder="Lectura evolutiva (Mensaje de los guías)" rows="4"></textarea>
+    
+    <div style="display:flex; gap:10px;">
+        <input id="bovisInicial" placeholder="Bovis Inicial (ej: 5.000)">
+        <input id="bovisFinal" placeholder="Bovis Final (ej: 12.000)">
+    </div>
 
-<input id="nombre" placeholder="Nombre del consultante">
+    <textarea id="recomendaciones" placeholder="Tareas o recomendaciones (opcional)"></textarea>
+    
+    <select id="frase">
+        <option>Cuando sanás tu pasado, tu presente florece y tu futuro se abre con luz.</option>
+        <option>Todo lo que liberás hoy, deja espacio para lo nuevo.</option>
+        <option>Tu energía en equilibrio es tu mayor poder.</option>
+    </select>
 
-<textarea id="lectura" placeholder="Lectura evolutiva (interpretación)"></textarea>
-
-<input id="bovisInicial" placeholder="Bovis inicial">
-<input id="bovisFinal" placeholder="Bovis final">
-
-<textarea id="conclusion" placeholder="Conclusión final"></textarea>
-
-<select id="frase">
-<option>Cuando sanás tu pasado, tu presente florece y tu futuro se abre con luz.</option>
-<option>Todo lo que liberás hoy, deja espacio para lo nuevo.</option>
-<option>Tu energía en equilibrio es tu mayor poder.</option>
-</select>
-
-<button onclick="generar()">Generar PDF</button>
-
-<!-- DISEÑO -->
-<div id="pdf" style="position:absolute; left:-9999px;">
-
-<h1>Sanación 11.11</h1>
-<p style="text-align:center;">Informe energético personalizado</p>
-
-<div class="section">
-<div class="title">Consultante</div>
-<div id="outNombre"></div>
+    <button onclick="generar()">GENERAR INFORME PREMIUM</button>
 </div>
 
-<div class="section">
-<div class="title">Lectura Evolutiva</div>
-<div id="outLectura"></div>
-</div>
+<div id="pdf-container">
+    <div class="border-frame">
+        <div class="header">
+            <h1>SANACIÓN 11.11</h1>
+            <p>Reporte de Armonización Energética</p>
+        </div>
 
-<div class="section">
-<div class="title">Sanación con Péndulo Karnak</div>
-<div id="outKarnak"></div>
-</div>
+        <div class="section">
+            <div class="section-title">Consultante</div>
+            <div id="outNombre" style="font-weight: 600;"></div>
+        </div>
 
-<div class="section">
-<div class="title">Nivel Energético</div>
-<div id="outBovis"></div>
-</div>
+        <div class="section">
+            <div class="section-title">Lectura Evolutiva</div>
+            <div id="outLectura" style="font-size: 13px; text-align: justify;"></div>
+        </div>
 
-<div class="section">
-<div class="title">Conclusión</div>
-<div id="outConclusion"></div>
-</div>
+        <div class="section">
+            <div class="section-title">Frecuencia Vibracional (Unidades Bovis)</div>
+            <div class="bovis-box">
+                <div class="bovis-item"><span>Estado Inicial</span><b id="outBovisIni"></b></div>
+                <div class="bovis-item" style="color: var(--oro); font-size: 20px;">➔</div>
+                <div class="bovis-item"><span>Estado Post-Sesión</span><b id="outBovisFin"></b></div>
+            </div>
+            <p id="outBovisNota" style="font-size: 11px; margin-top: 10px; color: #555;"></p>
+        </div>
 
-<div class="quote" id="outFrase"></div>
+        <div class="section">
+            <div class="section-title">Trabajo Realizado: Péndulo Karnak</div>
+            <div id="outKarnak" style="font-size: 12px; color: #444;"></div>
+        </div>
 
-<p style="margin-top:40px;">
-Con amor,<br>
-Clara – Sanación 11.11<br>
-+54 9 223 593-1151
-</p>
+        <div class="section" id="secRecomendaciones" style="display:none;">
+            <div class="section-title">Recomendaciones del Ser</div>
+            <div id="outRecomendaciones" style="font-size: 12px;"></div>
+        </div>
 
+        <div class="quote-box" id="outFrase"></div>
+
+        <div class="footer">
+            <div class="signature">Clara</div>
+            <div style="font-size: 12px; font-weight: 600;">Sanación 11.11</div>
+            <div class="contact">Mar del Plata, Argentina | +54 9 223 593-1151</div>
+        </div>
+    </div>
 </div>
 
 <script>
 function generar() {
+    // Captura de datos
+    const val = (id) => document.getElementById(id).value;
+    
+    document.getElementById("outNombre").innerText = val("nombre");
+    document.getElementById("outLectura").innerText = val("lectura");
+    document.getElementById("outBovisIni").innerText = val("bovisInicial");
+    document.getElementById("outBovisFin").innerText = val("bovisFinal");
+    document.getElementById("outFrase").innerText = `"${val("frase")}"`;
+    
+    // Recomendaciones (si hay)
+    if(val("recomendaciones")) {
+        document.getElementById("secRecomendaciones").style.display = "block";
+        document.getElementById("outRecomendaciones").innerText = val("recomendaciones");
+    }
 
-let nombre = document.getElementById("nombre").value;
-let lectura = document.getElementById("lectura").value;
-let conclusion = document.getElementById("conclusion").value;
-let frase = document.getElementById("frase").value;
+    // Texto dinámico Karnak
+    document.getElementById("outKarnak").innerText = "Se realizó una limpieza profunda de centros energéticos, eliminando bloqueos estancados y restaurando el flujo vital mediante geometría sagrada y radiónica.";
+    document.getElementById("outBovisNota").innerText = "La elevación de la frecuencia indica una integración exitosa del trabajo realizado, favoreciendo el bienestar físico y emocional.";
 
-let bIni = document.getElementById("bovisInicial").value;
-let bFin = document.getElementById("bovisFinal").value;
-
-// TEXTO AUTOMÁTICO KANRAK (PRO)
-let karnak = `
-Durante la sesión se realizó un proceso de limpieza y armonización energética mediante Péndulo Karnak.
-
-Se detectaron interferencias que estaban afectando el equilibrio emocional, mental y energético, generando una sensación de sobrecarga interna.
-
-A lo largo del trabajo, estas cargas fueron liberadas progresivamente, permitiendo una reorganización del campo energético y una mejora en la circulación de la energía vital.
-
-Esto favorece una mayor claridad mental, alivio emocional y una sensación de mayor estabilidad interna.
-`;
-
-let bovisText = `Nivel inicial: ${bIni} | Nivel final: ${bFin}.
-Se observa una elevación significativa en la frecuencia energética, indicando un campo más fuerte, equilibrado y vital.`;
-
-// OUTPUT
-document.getElementById("outNombre").innerText = nombre;
-document.getElementById("outLectura").innerText = lectura;
-document.getElementById("outConclusion").innerText = conclusion;
-document.getElementById("outFrase").innerText = frase;
-document.getElementById("outKarnak").innerText = karnak;
-document.getElementById("outBovis").innerText = bovisText;
-
-// EXPORTAR
-html2canvas(document.getElementById("pdf"), {scale:2}).then(canvas=>{
-let img = canvas.toDataURL("image/png");
-let {jsPDF} = window.jspdf;
-let pdf = new jsPDF();
-pdf.addImage(img,'PNG',0,0,210,297);
-pdf.save(nombre+"_informe.pdf");
-});
+    const container = document.getElementById("pdf-container");
+    
+    // Generar PDF con mayor calidad
+    html2canvas(container, {
+        scale: 3, // Mayor resolución
+        useCORS: true,
+        logging: false
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Informe_${val("nombre").replace(/ /g, "_")}.pdf`);
+    });
 }
 </script>
 
