@@ -2,200 +2,194 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Generador Sanación 11.11 - Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanación 11.11 - Sistema Profesional</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --oro: #c5a059;
-            --purpura: #4a1e4a;
-            --crema: #fdfaf6;
-        }
-
-        body { font-family: 'Montserrat', sans-serif; background: #ececec; padding: 40px; }
-        .admin-panel { max-width: 600px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: auto; }
+        :root { --oro: #c5a059; --purpura: #4a1e4a; --crema: #fdfaf6; }
+        body { font-family: 'Montserrat', sans-serif; background: #222; color: #333; padding: 20px; }
         
-        h2 { color: var(--purpura); font-family: 'Cinzel', serif; text-align: center; border-bottom: 2px solid var(--oro); padding-bottom: 10px; }
+        /* PANEL DE CONTROL */
+        .admin-panel { 
+            max-width: 800px; background: white; padding: 30px; border-radius: 20px; 
+            margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .grid-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        h2, h3 { font-family: 'Cinzel', serif; color: var(--purpura); border-bottom: 2px solid var(--oro); }
+        label { display: block; font-weight: bold; margin: 10px 0 5px; font-size: 12px; text-transform: uppercase; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
         
-        input, textarea, select { 
-            width: 100%; margin-bottom: 15px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Montserrat', sans-serif;
-            box-sizing: border-box;
-        }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f9f9f9; padding: 15px; border-radius: 10px; }
+        .checkbox-group div { display: flex; align-items: center; font-size: 13px; }
+        .checkbox-group input { width: auto; margin-right: 8px; }
 
-        button { 
-            width: 100%; padding: 15px; background: var(--purpura); color: white; border: none; 
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        .btn-generar { 
+            grid-column: span 2; padding: 20px; background: var(--purpura); color: white; 
+            font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 20px; font-size: 16px;
         }
-        button:hover { background: #632a63; transform: translateY(-2px); }
 
         /* DISEÑO PDF A4 */
         #pdf-container {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 25mm;
-            background: var(--crema);
-            position: absolute;
-            left: -9999px; /* Oculto */
-            box-sizing: border-box;
-            color: #333;
+            width: 210mm; min-height: 297mm; padding: 20mm; background: var(--crema);
+            position: absolute; left: -9999px; box-sizing: border-box;
         }
-
-        /* Marco Dorado */
-        .border-frame {
-            border: 3px solid var(--oro);
-            padding: 15mm;
-            height: 250mm;
-            position: relative;
-            background: white;
-        }
-
+        .page-border { border: 2px solid var(--oro); padding: 15mm; height: 253mm; position: relative; background: white; box-shadow: inset 0 0 50px rgba(197, 160, 89, 0.05); }
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 32px; letter-spacing: 3px; }
-        .header p { color: var(--oro); text-transform: uppercase; letter-spacing: 2px; font-size: 12px; font-weight: 600; }
+        .header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 28px; }
+        .header p { color: var(--oro); letter-spacing: 3px; font-size: 10px; font-weight: bold; }
 
-        .section { margin-bottom: 20px; line-height: 1.6; }
-        .section-title { 
-            font-family: 'Cinzel', serif; color: var(--purpura); 
-            border-bottom: 1px solid var(--oro); margin-bottom: 10px; font-weight: bold;
-        }
+        .section { margin-bottom: 18px; }
+        .section-title { font-family: 'Cinzel', serif; color: var(--purpura); border-bottom: 1px solid var(--oro); margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+        .text-content { font-size: 12.5px; line-height: 1.5; text-align: justify; }
 
-        /* Estilo Bovis */
-        .bovis-box {
-            display: flex;
-            justify-content: space-around;
-            background: #f9f4f9;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 5px solid var(--oro);
-        }
+        .bovis-box { display: flex; justify-content: space-around; background: #fdfaf6; border: 1px solid var(--oro); padding: 10px; border-radius: 8px; margin: 10px 0; }
+        .bovis-item { text-align: center; }
+        .bovis-item span { font-size: 9px; text-transform: uppercase; color: #888; display: block; }
+        .bovis-item b { font-size: 16px; color: var(--purpura); }
 
-        .bovis-item span { display: block; font-size: 10px; text-transform: uppercase; color: #777; }
-        .bovis-item b { font-size: 18px; color: var(--purpura); }
-
-        .footer { margin-top: 50px; text-align: center; }
-        .signature { font-family: 'Great Vibes', cursive; font-size: 28px; color: var(--purpura); margin-bottom: 5px; }
-        .contact { font-size: 11px; color: #888; }
-        
-        .quote-box {
-            margin-top: 30px;
-            font-style: italic;
-            text-align: center;
-            color: var(--purpura);
-            padding: 0 40px;
-        }
+        .footer { position: absolute; bottom: 15mm; left: 0; right: 0; text-align: center; }
+        .signature { font-family: 'Great Vibes', cursive; font-size: 30px; color: var(--purpura); }
     </style>
 </head>
 <body>
 
 <div class="admin-panel">
-    <h2>Sanación 11.11 - Editor</h2>
-    <input id="nombre" placeholder="Nombre completo del consultante">
-    <textarea id="lectura" placeholder="Lectura evolutiva (Mensaje de los guías)" rows="4"></textarea>
+    <h2>Sanación 11.11 - Editor Pro</h2>
     
-    <div style="display:flex; gap:10px;">
-        <input id="bovisInicial" placeholder="Bovis Inicial (ej: 5.000)">
-        <input id="bovisFinal" placeholder="Bovis Final (ej: 12.000)">
+    <div class="grid-editor">
+        <div>
+            <label>Consultante</label>
+            <input id="nombre" placeholder="Nombre completo">
+            <label>Fecha de Nacimiento</label>
+            <input id="fecha" placeholder="dd/mm/aaaa">
+        </div>
+        <div>
+            <label>Energía Bovis</label>
+            <div style="display:flex; gap:10px;">
+                <input id="bIni" placeholder="Inicial">
+                <input id="bFin" placeholder="Final">
+            </div>
+        </div>
+
+        <div style="grid-column: span 2;">
+            <label>Lectura de Cartas (Pasado, Presente, Futuro)</label>
+            <textarea id="lectura" rows="4" placeholder="Describe lo que salió en las cartas..."></textarea>
+        </div>
+
+        <div style="grid-column: span 2;">
+            <label>Limpieza con Péndulo Karnak (Tildá lo detectado y eliminado)</label>
+            <div class="checkbox-group">
+                <div><input type="checkbox" id="c1" value="Agresiones psicodinámicas"> Agresiones psicodinámicas</div>
+                <div><input type="checkbox" id="c2" value="Mal de ojo"> Mal de ojo</div>
+                <div><input type="checkbox" id="c3" value="Envidia"> Envidia</div>
+                <div><input type="checkbox" id="c4" value="Magia psíquica/ritual"> Magia psíquica/ritual</div>
+                <div><input type="checkbox" id="c5" value="Desencarnados"> Desencarnados</div>
+                <div><input type="checkbox" id="c6" value="Bajo astral"> Bajo astral</div>
+                <div><input type="checkbox" id="c7" value="Palacio de Cristal"> Palacio de Cristal desalineado</div>
+                <div><input type="checkbox" id="c8" value="Ataduras en plexo solar"> Ataduras en plexo solar</div>
+                <div><input type="checkbox" id="c9" value="Chakras desalineados" checked> Chakras desalineados</div>
+            </div>
+        </div>
+
+        <div style="grid-column: span 2;">
+            <label>Síntesis / Conclusión (Elegí una o escribí abajo)</label>
+            <select id="selectSintesis" onchange="document.getElementById('manualSintesis').value = this.value">
+                <option value="">-- Seleccionar opción pro --</option>
+                <option value="Los bloqueos actuales son nubes pasajeras. La sanación de hoy despeja el camino para que tu abundancia natural se manifieste sin restricciones.">Enfoque Apertura</option>
+                <option value="Al haber alineado tus centros energéticos, tu capacidad de manifestación se multiplica. El éxito es ahora una consecuencia de tu nuevo estado.">Enfoque Alineación</option>
+                <option value="Has recuperado tu soberanía energética. Cada decisión tomada desde la paz interior será un paso firme hacia tu realización personal.">Enfoque Empoderamiento</option>
+            </select>
+            <textarea id="manualSintesis" rows="3" style="margin-top:10px;" placeholder="O escribí una conclusión personalizada..."></textarea>
+        </div>
+
+        <div style="grid-column: span 2;">
+            <label>Recomendaciones Post-Sesión (Tarea para el consultante)</label>
+            <input id="tareas" placeholder="Ej: Tomar mucha agua, meditación de 11 min, sahumar el hogar..." value="Tomar abundante agua para ayudar a decantar la energía, descansar y observar los sueños.">
+        </div>
+
+        <button class="btn-generar" onclick="generar()">GENERAR INFORME NIVEL DIOS</button>
     </div>
-
-    <textarea id="recomendaciones" placeholder="Tareas o recomendaciones (opcional)"></textarea>
-    
-    <select id="frase">
-        <option>Cuando sanás tu pasado, tu presente florece y tu futuro se abre con luz.</option>
-        <option>Todo lo que liberás hoy, deja espacio para lo nuevo.</option>
-        <option>Tu energía en equilibrio es tu mayor poder.</option>
-    </select>
-
-    <button onclick="generar()">GENERAR INFORME PREMIUM</button>
 </div>
 
 <div id="pdf-container">
-    <div class="border-frame">
+    <div class="page-border">
         <div class="header">
             <h1>SANACIÓN 11.11</h1>
-            <p>Reporte de Armonización Energética</p>
+            <p>Devolución Evolutiva y Energética</p>
         </div>
 
         <div class="section">
             <div class="section-title">Consultante</div>
-            <div id="outNombre" style="font-weight: 600;"></div>
+            <div class="text-content"><b>Nombre:</b> <span id="outNombre"></span> | <b>Nacimiento:</b> <span id="outFecha"></span> [cite: 2]</div>
         </div>
 
         <div class="section">
-            <div class="section-title">Lectura Evolutiva</div>
-            <div id="outLectura" style="font-size: 13px; text-align: justify;"></div>
+            <div class="section-title">Lectura Evolutiva con Cartas</div>
+            <div id="outLectura" class="text-content"></div> [cite: 3]
         </div>
 
         <div class="section">
             <div class="section-title">Frecuencia Vibracional (Unidades Bovis)</div>
             <div class="bovis-box">
-                <div class="bovis-item"><span>Estado Inicial</span><b id="outBovisIni"></b></div>
-                <div class="bovis-item" style="color: var(--oro); font-size: 20px;">➔</div>
-                <div class="bovis-item"><span>Estado Post-Sesión</span><b id="outBovisFin"></b></div>
+                <div class="bovis-item"><span>Nivel Inicial</span><b id="outBovisIni"></b></div> [cite: 19]
+                <div class="bovis-item" style="color:var(--oro)">➔</div>
+                <div class="bovis-item"><span>Nivel Post-Sanación</span><b id="outBovisFin"></b></div> [cite: 20]
             </div>
-            <p id="outBovisNota" style="font-size: 11px; margin-top: 10px; color: #555;"></p>
+            <div style="font-size: 10px; color: #666; font-style: italic;">*Un nivel superior a 8.500 unidades indica una vitalidad equilibrada y óptima.</div> [cite: 20]
         </div>
 
         <div class="section">
-            <div class="section-title">Trabajo Realizado: Péndulo Karnak</div>
-            <div id="outKarnak" style="font-size: 12px; color: #444;"></div>
+            <div class="section-title">Sanación con Péndulo Karnak</div>
+            <div class="text-content" id="outLimpieza"></div> [cite: 17]
         </div>
 
-        <div class="section" id="secRecomendaciones" style="display:none;">
-            <div class="section-title">Recomendaciones del Ser</div>
-            <div id="outRecomendaciones" style="font-size: 12px;"></div>
+        <div class="section">
+            <div class="section-title">Síntesis y Conclusión</div>
+            <div id="outConclusion" class="text-content" style="background: #fdfaf6; padding: 10px; border-radius: 5px;"></div> [cite: 34, 35]
         </div>
 
-        <div class="quote-box" id="outFrase"></div>
+        <div class="section">
+            <div class="section-title">Guía de Autocuidado</div>
+            <div id="outTareas" class="text-content" style="color: var(--purpura); font-weight: 600;"></div>
+        </div>
 
         <div class="footer">
-            <div class="signature">Clara</div>
-            <div style="font-size: 12px; font-weight: 600;">Sanación 11.11</div>
-            <div class="contact">Mar del Plata, Argentina | +54 9 223 593-1151</div>
+            <div class="signature">Clara</div> [cite: 38]
+            <div style="font-size: 11px; font-weight: bold; color: var(--purpura);">Sanación 11.11</div>
+            <div style="font-size: 10px; color: #888;">Mar del Plata, Argentina | +54 9 223 593-1151</div> [cite: 39]
         </div>
     </div>
 </div>
 
 <script>
 function generar() {
-    // Captura de datos
-    const val = (id) => document.getElementById(id).value;
-    
-    document.getElementById("outNombre").innerText = val("nombre");
-    document.getElementById("outLectura").innerText = val("lectura");
-    document.getElementById("outBovisIni").innerText = val("bovisInicial");
-    document.getElementById("outBovisFin").innerText = val("bovisFinal");
-    document.getElementById("outFrase").innerText = `"${val("frase")}"`;
-    
-    // Recomendaciones (si hay)
-    if(val("recomendaciones")) {
-        document.getElementById("secRecomendaciones").style.display = "block";
-        document.getElementById("outRecomendaciones").innerText = val("recomendaciones");
-    }
+    // 1. Mapear datos
+    document.getElementById("outNombre").innerText = document.getElementById("nombre").value;
+    document.getElementById("outFecha").innerText = document.getElementById("fecha").value;
+    document.getElementById("outLectura").innerText = document.getElementById("lectura").value;
+    document.getElementById("outBovisIni").innerText = document.getElementById("bIni").value;
+    document.getElementById("outBovisFin").innerText = document.getElementById("bFin").value;
+    document.getElementById("outConclusion").innerText = document.getElementById("manualSintesis").value;
+    document.getElementById("outTareas").innerText = "✔ " + document.getElementById("tareas").value;
 
-    // Texto dinámico Karnak
-    document.getElementById("outKarnak").innerText = "Se realizó una limpieza profunda de centros energéticos, eliminando bloqueos estancados y restaurando el flujo vital mediante geometría sagrada y radiónica.";
-    document.getElementById("outBovisNota").innerText = "La elevación de la frecuencia indica una integración exitosa del trabajo realizado, favoreciendo el bienestar físico y emocional.";
+    // 2. Lógica de Checkboxes (Solo agrega lo que tildaste)
+    let checks = document.querySelectorAll('.checkbox-group input:checked');
+    let listaLimpieza = "Durante la sesión se detectaron y transmutaron con éxito: <br>• " + 
+                        Array.from(checks).map(c => c.value).join("<br>• ");
+    document.getElementById("outLimpieza").innerHTML = listaLimpieza + 
+    "<br><br>El campo energético ha quedado sellado y protegido."; [cite: 21, 36]
 
+    // 3. Renderizar PDF
     const container = document.getElementById("pdf-container");
-    
-    // Generar PDF con mayor calidad
-    html2canvas(container, {
-        scale: 3, // Mayor resolución
-        useCORS: true,
-        logging: false
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    html2canvas(container, { scale: 3, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`Informe_${val("nombre").replace(/ /g, "_")}.pdf`);
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+        pdf.save(`Informe_${document.getElementById("nombre").value.replace(/ /g, "_")}.pdf`);
     });
 }
 </script>
