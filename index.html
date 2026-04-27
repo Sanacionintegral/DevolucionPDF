@@ -2,251 +2,167 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sanación 11.11 - Sistema de Devolución Premium v2.0</title>
+    <title>Sanación 11.11 - Reporte Multipage Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
 
     <style>
-        /* [Los mismos estilos del Admin Panel se mantienen] */
         :root { --oro: #c5a059; --purpura: #4a1e4a; --crema: #fdfaf6; }
         body { font-family: 'Montserrat', sans-serif; background: #1a1a1a; color: #333; padding: 20px; }
-        .admin-panel { max-width: 900px; background: white; padding: 40px; border-radius: 25px; margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        h2 { font-family: 'Cinzel', serif; color: var(--purpura); text-align: center; border-bottom: 2px solid var(--oro); padding-bottom: 10px; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--purpura); font-size: 13px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box;}
-        .checkbox-container { grid-column: span 2; background: #fdfaf6; padding: 20px; border-radius: 15px; border: 1px solid #eee; }
+        .admin-panel { max-width: 900px; background: white; padding: 40px; border-radius: 25px; margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 50px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box;}
+        label { display: block; font-weight: 600; margin: 10px 0 5px; color: var(--purpura); font-size: 13px; }
+        .checkbox-container { grid-column: span 2; background: #fdfaf6; padding: 20px; border-radius: 15px; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .check-item { display: flex; align-items: center; font-size: 13px; }
-        .check-item input { width: auto; margin-right: 10px; margin-bottom: 0; }
-        .btn-magic { grid-column: span 2; background: var(--purpura); color: white; padding: 20px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.4s; margin-top: 20px; font-family: 'Cinzel', serif; width: 100%;}
-        .btn-magic:hover { background: var(--oro); transform: scale(1.02); }
-        .img-preview { max-width: 100%; height: 200px; object-fit: contain; margin-top: 10px; border: 2px dashed var(--oro); border-radius: 10px; display: none;}
+        .btn-magic { grid-column: span 2; background: var(--purpura); color: white; padding: 20px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 18px; width: 100%; font-family: 'Cinzel', serif; }
 
-        /* DISEÑO PDF v2.0 - Corregido para evitar estiramientos y superposiciones */
-        #pdf-container { width: 210mm; background: var(--crema); position: absolute; left: -9999px; }
-        .pdf-page-content { background: white; border: 1px solid var(--oro); padding: 15mm; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.05); }
-        .pdf-header { text-align: center; margin-bottom: 20px; }
-        .pdf-header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 30px; letter-spacing: 4px; }
-        .pdf-header p { color: var(--oro); text-transform: uppercase; letter-spacing: 2px; font-size: 10px; margin-top: 5px; }
-        .pdf-section { margin-bottom: 15px; }
-        .pdf-section-title { font-family: 'Cinzel', serif; color: var(--purpura); border-bottom: 1px solid var(--oro); margin-bottom: 8px; font-size: 14px; padding-bottom: 3px; text-transform: uppercase;}
-        .pdf-text { font-size: 12px; line-height: 1.5; text-align: justify; color: #444; }
-        .bovis-table { display: flex; justify-content: space-around; background: #f9f4f9; border-radius: 10px; padding: 10px; margin: 10px 0; border: 1px solid #eee; }
+        /* ESTILOS PDF - 3 HOJAS SEPARADAS */
+        #pdf-render-area { position: absolute; left: -9999px; width: 210mm; }
+        
+        .pdf-page { 
+            width: 210mm; height: 297mm; background: var(--crema); padding: 20mm; 
+            box-sizing: border-box; position: relative; overflow: hidden; margin-bottom: 10mm;
+        }
+        .inner-border { border: 1px solid var(--oro); height: 100%; padding: 15mm; box-sizing: border-box; background: white; position: relative; }
+        
+        .pdf-header { text-align: center; margin-bottom: 25px; }
+        .pdf-header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 28px; letter-spacing: 3px; }
+        .pdf-header p { color: var(--oro); text-transform: uppercase; letter-spacing: 2px; font-size: 10px; }
+
+        .pdf-section-title { font-family: 'Cinzel', serif; color: var(--purpura); border-bottom: 1px solid var(--oro); margin-bottom: 15px; font-size: 16px; padding-bottom: 5px; text-transform: uppercase; }
+        .pdf-text { font-size: 13px; line-height: 1.6; text-align: justify; color: #333; }
+
+        /* IMAGEN 10x15 cm */
+        .photo-frame { width: 150mm; height: 100mm; margin: 20px auto; border: 1px solid var(--oro); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f9f9f9; }
+        .photo-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .bovis-table { display: flex; justify-content: space-around; background: #fdfaf6; border-radius: 10px; padding: 15px; border: 1px solid #eee; margin: 20px 0; }
         .bovis-val { text-align: center; }
-        .bovis-val small { font-size: 9px; display: block; color: #888; }
-        .bovis-val b { font-size: 18px; color: var(--purpura); }
-        .glosario-item { margin-bottom: 8px; border-left: 2px solid var(--oro); padding-left: 10px; }
-        .glosario-item b { color: var(--purpura); font-size: 12px; }
-        .glosario-item p { margin: 2px 0 0 0; font-size: 11px; font-style: italic; color: #666; }
-        
-        /* Ajuste de imagen v2.0: No estira */
-        .pdf-img-container { width: 100%; text-align: center; margin: 10px 0; max-height: 80mm; overflow: hidden; display: none; }
-        .pdf-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* Firma v2.0: No fija, se mueve con el texto */
-        .signature-box-v2 { text-align: center; margin-top: 25mm; border-top: 1px solid #eee; padding-top: 10mm; }
-        .sig-name { font-family: 'Great Vibes', cursive; font-size: 32px; color: var(--purpura); margin: 0; }
+        .bovis-val b { font-size: 22px; color: var(--purpura); display: block; }
+
+        .glosario-item { margin-bottom: 10px; border-left: 3px solid var(--oro); padding-left: 12px; }
+        .glosario-item b { color: var(--purpura); font-size: 13px; }
+        .glosario-item p { margin: 3px 0; font-size: 11px; font-style: italic; color: #555; }
+
+        .footer-last { text-align: center; margin-top: 30mm; }
+        .sig-name { font-family: 'Great Vibes', cursive; font-size: 35px; color: var(--purpura); margin: 0; }
     </style>
 </head>
 <body>
 
 <div class="admin-panel">
-    <h2>Generador Sanación 11.11 Premium v2.0</h2>
+    <h2>Editor Sanación 11.11 - Multi-Página</h2>
     <div class="grid">
-        <div>
-            <label>Nombre del Consultante</label>
-            <input id="nombre" placeholder="Nombre completo">
-        </div>
-        <div>
-            <label>Fecha (Solo números)</label>
-            <input id="fecha" placeholder="Ej: 06031993" maxlength="8">
-        </div>
-        <div style="grid-column: span 2;">
-            <label>Lectura Evolutiva (Interpretación)</label>
-            <textarea id="lectura" rows="4" placeholder="Describe los arquetipos y mensajes recibidos..."></textarea>
-            <label>Foto de la tirada</label>
-            <input type="file" id="fotoInput" accept="image/*" onchange="previewImage(event)">
-            <img id="prev" class="img-preview">
-        </div>
-        <div>
-            <label>Bovis Inicial</label>
-            <input id="bIni" placeholder="Ej: 3.000">
-        </div>
-        <div>
-            <label>Bovis Final</label>
-            <input id="bFin" placeholder="Ej: 9.000">
-        </div>
+        <div><label>Consultante</label><input id="nombre" placeholder="Tatiana Zayas"></div>
+        <div><label>Fecha (06031993)</label><input id="fecha" maxlength="8"></div>
+        <div style="grid-column: span 2;"><label>Lectura Evolutiva</label><textarea id="lectura" rows="5"></textarea></div>
+        <div style="grid-column: span 2;"><label>Foto de la Tirada (Saldrá 10x15cm)</label><input type="file" onchange="loadImg(event)"></div>
+        <div><label>Bovis Inicial</label><input id="bIni" value="3.000"></div>
+        <div><label>Bovis Final</label><input id="bFin" value="9.000"></div>
+        
         <div class="checkbox-container">
-            <label>Limpieza Péndulo Karnak (Tildá lo detectado)</label>
+            <label>Limpieza Péndulo (Tildá lo detectado)</label>
             <div class="check-grid">
-                <div class="check-item"><input type="checkbox" id="k1" value="Agresiones Psicodinámicas" data-desc="Formas de pensamiento negativas propias o ajenas que se cristalizan en el aura."> Agresiones Psicodinámicas</div>
-                <div class="check-item"><input type="checkbox" id="k2" value="Mal de Ojo" data-desc="Energía proyectada por una mirada fuerte de envidia o deseo negativo consciente o inconsciente."> Mal de Ojo</div>
-                <div class="check-item"><input type="checkbox" id="k3" value="Envidia" data-desc="Carga energética de baja vibración que actúa como un lastre en tus proyectos."> Envidia</div>
-                <div class="check-item"><input type="checkbox" id="k4" value="Magia Psíquica" data-desc="Influencia mental dirigida para alterar tu libre albedrío o estado de ánimo."> Magia Psíquica</div>
-                <div class="check-item"><input type="checkbox" id="k5" value="Magia Ritual" data-desc="Trabajos energéticos intencionados que bloquean áreas específicas de la vida."> Magia Ritual</div>
-                <div class="check-item"><input type="checkbox" id="k6" value="Desencarnados" data-desc="Almas que no han trascendido y se adhieren al campo buscando energía vital."> Desencarnados</div>
-                <div class="check-item"><input type="checkbox" id="k7" value="Espíritu Invasor" data-desc="Entidades parasitarias que nublan el pensamiento y drenan la fuerza emocional."> Espíritu Invasor</div>
-                <div class="check-item"><input type="checkbox" id="k8" value="Bajo Astral" data-desc="Frecuencias de miedo o dolor que bajan tu vibración y atraen bloqueos."> Bajo Astral</div>
+                <div class="check-item"><input type="checkbox" id="k1" value="Agresiones Psicodinámicas" data-desc="Formas de pensamiento negativas que bloquean la armonía."> Agresiones</div>
+                <div class="check-item"><input type="checkbox" id="k2" value="Mal de Ojo" data-desc="Energía proyectada por mirada de envidia o deseo negativo."> Mal de Ojo</div>
+                <div class="check-item"><input type="checkbox" id="k3" value="Envidia" data-desc="Carga energética de baja vibración que actúa como lastre."> Envidia</div>
+                <div class="check-item"><input type="checkbox" id="k4" value="Magia Psíquica" data-desc="Influencia mental dirigida para alterar tu estado de ánimo."> Magia Psíquica</div>
+                <div class="check-item"><input type="checkbox" id="k5" value="Magia Ritual" data-desc="Trabajos intencionados que bloquean áreas de la vida."> Magia Ritual</div>
+                <div class="check-item"><input type="checkbox" id="k6" value="Desencarnados" data-desc="Almas que no han trascendido y se adhieren al campo."> Desencarnados</div>
+                <div class="check-item"><input type="checkbox" id="k7" value="Espíritu Invasor" data-desc="Entidades parasitarias que drenan la fuerza emocional."> Espíritu Invasor</div>
+                <div class="check-item"><input type="checkbox" id="k8" value="Bajo Astral" data-desc="Frecuencias de miedo o dolor que atraen bloqueos."> Bajo Astral</div>
             </div>
         </div>
-        <div style="grid-column: span 2;">
-            <label>Síntesis (Seleccionar o escribir)</label>
-            <select onchange="document.getElementById('manualSintesis').value = this.value">
-                <option value="">-- Elige un mensaje con alma --</option>
-                <option value="Tu alma ha hablado hoy para recordarte que eres un ser de luz infinita. Este proceso no es solo una limpieza, es un renacer. Permítete brillar sin miedo, el universo ya ha abierto las puertas que creías cerradas.">Mensaje de Renacimiento</option>
-                <option value="Lo que hoy soltamos en esta camilla no regresa más. Has recuperado tu poder y tu brillo original. Camina con la certeza de que estás protegida y de que tu vibración ahora atrae solo amor y expansión.">Mensaje de Poder</option>
-                <option value="Siento una inmensa gratitud por permitirme acompañar este proceso. Tu energía ha dado un salto cuántico; hoy sales de aquí siendo una versión más clara de ti misma. Confía en lo que sientes, tu intuición es tu nueva brújula.">Mensaje de Gratitud</option>
-            </select>
-            <textarea id="manualSintesis" rows="3" style="margin-top:10px;"></textarea>
-        </div>
-        <div style="grid-column: span 2;">
-            <label>Recomendaciones Post-Sesión</label>
-            <select onchange="document.getElementById('manualRec').value = this.value">
-                <option value="">-- Alternativas profesionales --</option>
-                <option value="Beber abundante agua durante las próximas 48hs para ayudar a la transmutación celular. Evitar ambientes concurridos hoy.">Protocolo de Purificación</option>
-                <option value="Realizar un baño de descarga con sal gruesa y romero. Meditar 5 minutos antes de dormir visualizando luz dorada en el plexo.">Protocolo de Protección</option>
-                <option value="Escribir en una hoja todo lo que hoy sientes que liberaste y quemarla bajo la luz de la luna o sol.">Protocolo de Cierre de Ciclos</option>
-            </select>
-            <textarea id="manualRec" rows="2" style="margin-top:10px;"></textarea>
-        </div>
+
+        <div style="grid-column: span 2;"><label>Síntesis de la Sesión</label><textarea id="sintesis" rows="3"></textarea></div>
+        <div style="grid-column: span 2;"><label>Recomendaciones</label><textarea id="manualRec" rows="2"></textarea></div>
     </div>
-    <button class="btn-magic" onclick="generarTodo()">GENERAR REPORTE SAGRADO PDF (v2.0)</button>
+    <button class="btn-magic" onclick="renderPDF()">GENERAR PDF DE 3 PÁGINAS</button>
 </div>
 
-<div id="pdf-container">
-    <div class="pdf-page-content">
-        <div class="pdf-header">
-            <h1>SANACIÓN 11.11</h1>
-            <p>Reporte de Evolución y Armonización Energética</p>
-        </div>
-
-        <div class="pdf-section">
-            <div class="pdf-section-title">Consultante</div>
-            <div class="pdf-text"><b>Nombre:</b> <span id="outNombre"></span> | <b>Fecha:</b> <span id="outFecha"></span></div>
-        </div>
-
-        <div class="pdf-section">
-            <div class="pdf-section-title">Lectura Evolutiva</div>
+<div id="pdf-render-area">
+    <div class="pdf-page" id="p1">
+        <div class="inner-border">
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Lectura Evolutiva de Cartas</p></div>
+            <div class="pdf-text" style="margin-bottom:15px;"><b>Consultante:</b> <span id="outNombre"></span> | <span id="outFecha"></span></div>
+            <div class="pdf-section-title">Mensaje de los Arcanos</div>
             <div id="outLectura" class="pdf-text"></div>
-            <div id="outFotoContainer" class="pdf-img-container">
-                <img id="outFoto" class="pdf-img">
-            </div>
+            <div class="photo-frame"><img id="outFoto"></div>
         </div>
+    </div>
 
-        <div class="pdf-section">
-            <div class="pdf-section-title">Frecuencia Vibracional (Unidades Bovis)</div>
+    <div class="pdf-page" id="p2">
+        <div class="inner-border">
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Armonización con Péndulo Karnak</p></div>
+            <div class="pdf-section-title">Frecuencia Vibracional (Bovis)</div>
             <div class="bovis-table">
-                <div class="bovis-val"><small>Estado Inicial</small><b id="outBIni"></b></div>
-                <div style="font-size: 20px; color: var(--oro);">✧</div>
-                <div class="bovis-val"><small>Post-Armonización</small><b id="outBFin"></b></div>
+                <div class="bovis-val"><small>Inicial</small><b id="outBIni"></b></div>
+                <div style="color:var(--oro); font-size:30px;">✧</div>
+                <div class="bovis-val"><small>Post-Sesión</small><b id="outBFin"></b></div>
             </div>
-        </div>
-
-        <div class="pdf-section">
-            <div class="pdf-section-title">Sanación con Péndulo Karnak</div>
+            <div class="pdf-section-title">Limpieza y Transmutación</div>
             <div id="outGlosario" class="pdf-text"></div>
         </div>
+    </div>
 
-        <div class="pdf-section">
+    <div class="pdf-page" id="p3">
+        <div class="inner-border">
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Cierre y Recomendaciones</p></div>
             <div class="pdf-section-title">SÍNTESIS DE LA SESIÓN</div>
-            <div id="outSintesis" class="pdf-text" style="font-style: italic; color: var(--purpura); background: #fdfaf6; padding: 10px; border-radius: 5px;"></div>
-        </div>
+            <div id="outSintesis" class="pdf-text" style="background:#fdfaf6; padding:20px; font-style:italic; border-radius:10px;"></div>
+            
+            <div class="pdf-section-title" style="margin-top:30px;">Guía de Autocuidado</div>
+            <div id="outRec" class="pdf-text" style="color:var(--oro); font-weight:600;"></div>
 
-        <div class="pdf-section">
-            <div class="pdf-section-title">Guía de Autocuidado Post-Sesión</div>
-            <div id="outRec" class="pdf-text" style="color: var(--oro); font-weight: 600;"></div>
-        </div>
-
-        <div class="signature-box-v2">
-            <p class="sig-name">Clara</p>
-            <p style="font-size: 10px; font-weight: bold; margin:0; color: #444;">Sanación 11.11 | Mar del Plata</p>
-            <p style="font-size: 9px; color: #888; margin-top:2px;">+54 9 223 593-1151 | @sanacion11.11</p>
+            <div class="footer-last">
+                <p class="sig-name">Clara</p>
+                <p style="font-size:12px; font-weight:bold; color:var(--purpura); margin:0;">Sanación 11.11 | Mar del Plata</p>
+                <p style="font-size:10px; color:#888;">+54 9 223 593-1151 | @sanacion11.11</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-// Auto-formato de fecha (Mismo script)
-document.getElementById('fecha').addEventListener('input', function (e) {
-    let v = e.target.value.replace(/\D/g, '');
-    if (v.length >= 8) {
-        e.target.value = v.substring(0,2) + '/' + v.substring(2,4) + '/' + v.substring(4,8);
-    }
-});
-
-function previewImage(event) {
+let imgData = "";
+function loadImg(e) {
     const reader = new FileReader();
-    reader.onload = function(){
-        const prev = document.getElementById('prev');
-        prev.src = reader.result;
-        prev.style.display = 'block';
-        
-        const outFoto = document.getElementById('outFoto');
-        const outFotoCont = document.getElementById('outFotoContainer');
-        outFoto.src = reader.result;
-        outFotoCont.style.display = 'block';
-    }
-    reader.readAsDataURL(event.target.files[0]);
+    reader.onload = () => { document.getElementById('outFoto').src = reader.result; imgData = reader.result; }
+    reader.readAsDataURL(e.target.files[0]);
 }
 
-// NUEVA FUNCIÓN DE GENERACIÓN v2.0
-async function generarTodo() {
+async function renderPDF() {
     const { jsPDF } = window.jspdf;
-    const btn = document.querySelector('.btn-magic');
-    btn.innerText = "Calculando energía y generando PDF...";
-    btn.disabled = true;
-
-    // Pasar datos al PDF (Mismo mapeo)
-    document.getElementById("outNombre").innerText = document.getElementById("nombre").value || 'No especificado';
-    document.getElementById("outFecha").innerText = document.getElementById("fecha").value || '--/--/----';
-    document.getElementById("outLectura").innerText = document.getElementById("lectura").value || 'No se registraron cartas en esta sesión.';
-    document.getElementById("outBIni").innerText = document.getElementById("bIni").value || '--';
-    document.getElementById("outBFin").innerText = document.getElementById("bFin").value || '--';
-    document.getElementById("outSintesis").innerText = document.getElementById("manualSintesis").value || 'No se registró síntesis.';
-    document.getElementById("outRec").innerText = document.getElementById("manualRec").value ? "✨ " + document.getElementById("manualRec").value : 'Observa tu descanso y mantente hidratado.';
-
-    // Glosario dinámico (Mismo script)
-    let glosarioHtml = "Durante la sesión se detectaron y transmutaron con éxito:<br><br>";
-    let hayChecks = false;
-    document.querySelectorAll('.check-grid input:checked').forEach(c => {
-        hayChecks = true;
-        glosarioHtml += `<div class="glosario-item"><b>${c.value}:</b> <p>${c.getAttribute('data-desc')}</p></div>`;
-    });
-    if(!hayChecks) glosarioHtml = "Campo energético armónico sin interferencias externas detectadas en este plano.";
-    document.getElementById("outGlosario").innerHTML = glosarioHtml;
-
-    const container = document.getElementById("pdf-container");
+    const pdf = new jsPDF('p', 'mm', 'a4');
     
-    // Pequeño retraso para asegurar que los textos largos se acomoden y la imagen cargue
-    await new Promise(r => setTimeout(r, 800));
+    // Mapeo
+    document.getElementById("outNombre").innerText = document.getElementById("nombre").value;
+    document.getElementById("outFecha").innerText = document.getElementById("fecha").value;
+    document.getElementById("outLectura").innerText = document.getElementById("lectura").value;
+    document.getElementById("outBIni").innerText = document.getElementById("bIni").value;
+    document.getElementById("outBFin").innerText = document.getElementById("bFin").value;
+    document.getElementById("outSintesis").innerText = document.getElementById("sintesis").value;
+    document.getElementById("outRec").innerText = "✨ " + document.getElementById("manualRec").value;
 
-    // html2canvas con alta escala para calidad de impresión
-    html2canvas(container, { 
-        scale: 3, 
-        useCORS: true, 
-        logging: false, 
-        windowHeight: container.scrollHeight, 
-        windowWidth: 210 * 3.78 // Medida A4 en pixeles
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 0.98);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        // Ajuste de la imagen al PDF sin estiramiento (se estira el canvas completo, no el contenido)
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        
-        const nombreVal = document.getElementById("nombre").value.replace(/ /g, "_") || 'Consultante';
-        pdf.save(`Sanacion_11.11_${nombreVal}.pdf`);
-        
-        btn.innerText = "GENERAR REPORTE SAGRADO PDF (v2.0)";
-        btn.disabled = false;
+    let glosario = "";
+    document.querySelectorAll('.check-grid input:checked').forEach(c => {
+        glosario += `<div class="glosario-item"><b>${c.value}:</b><p>${c.getAttribute('data-desc')}</p></div>`;
     });
+    document.getElementById("outGlosario").innerHTML = glosario || "Campo energético limpio.";
+
+    // Renderizar hoja por hoja
+    const hojas = ['p1', 'p2', 'p3'];
+    for(let i=0; i<hojas.length; i++) {
+        const canvas = await html2canvas(document.getElementById(hojas[i]), {scale:2});
+        const img = canvas.toDataURL('image/jpeg', 0.9);
+        if(i > 0) pdf.addPage();
+        pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+    }
+
+    pdf.save(`Sanacion_11.11_${document.getElementById("nombre").value}.pdf`);
 }
 </script>
-
 </body>
 </html>
