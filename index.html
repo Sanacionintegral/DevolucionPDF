@@ -2,170 +2,201 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sanación 11.11 - Reporte Visual</title>
+    <title>Sanación 11.11 - Reporte Premium</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
 
     <style>
         :root { --oro: #c5a059; --purpura: #4a1e4a; --crema: #fdfaf6; --purpura-luz: #f4eff4; }
-        body { font-family: 'Montserrat', sans-serif; background: #121212; padding: 20px; color: #333; }
-        .admin-panel { max-width: 900px; background: white; padding: 30px; border-radius: 20px; margin: auto; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        label { display: block; font-weight: 600; margin: 10px 0 5px; color: var(--purpura); font-size: 12px; }
-        .btn-magic { grid-column: span 2; background: var(--purpura); color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: 'Cinzel'; margin-top: 20px; }
+        body { font-family: 'Montserrat', sans-serif; background: #121212; color: #333; padding: 20px; }
+        .admin-panel { max-width: 1000px; background: white; padding: 40px; border-radius: 25px; margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: 'Montserrat'; }
+        label { display: block; font-weight: 600; margin: 10px 0 5px; color: var(--purpura); font-size: 13px; }
+        .btn-magic { grid-column: span 2; background: var(--purpura); color: white; padding: 20px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 18px; width: 100%; font-family: 'Cinzel', serif; transition: 0.3s; margin-top: 20px; }
+        .btn-magic:hover { background: var(--oro); }
 
-        /* ESTILOS PDF */
+        /* DISEÑO PDF */
         #pdf-render-area { position: absolute; left: -9999px; width: 210mm; }
-        .pdf-page { width: 210mm; height: 297mm; background: var(--crema); padding: 15mm; box-sizing: border-box; }
-        .inner-border { border: 1px solid var(--oro); height: 100%; padding: 10mm; box-sizing: border-box; background: white; display: flex; flex-direction: column; position: relative; }
-        .pdf-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid var(--oro); padding-bottom: 10px; }
-        .pdf-header h1 { font-family: 'Cinzel'; color: var(--purpura); font-size: 24px; margin: 0; letter-spacing: 3px; }
+        .pdf-page { width: 210mm; height: 297mm; background: var(--crema); padding: 15mm; box-sizing: border-box; position: relative; }
+        .inner-border { border: 1px solid var(--oro); height: 100%; padding: 12mm; box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column; }
         
-        /* HOJA 1: FOTO GRANDE */
-        .photo-main { width: 100%; height: 160mm; border: 1px solid var(--purpura-luz); display: flex; align-items: center; justify-content: center; background: #fdfdfd; margin: 20px 0; }
-        .photo-main img { max-width: 95%; max-height: 95%; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-
-        /* HOJA 2: CHAKRAS Y BOVIS */
-        .bovis-row { display: flex; justify-content: space-around; margin: 15px 0; background: var(--purpura-luz); padding: 15px; border-radius: 10px; border: 1px solid var(--oro); }
-        .bovis-item { text-align: center; }
-        .bovis-item b { font-size: 22px; color: var(--purpura); display: block; }
-
-        .chakra-system { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
-        .chakra-list { font-size: 10px; line-height: 1.6; color: #444; }
-        .chakra-list b { color: var(--purpura); font-size: 11px; text-transform: uppercase; }
+        .pdf-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--purpura-luz); padding-bottom: 15px; }
+        .pdf-header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 26px; letter-spacing: 4px; }
         
-        .pdf-section-title { font-family: 'Cinzel'; color: white; background: var(--purpura); font-size: 12px; padding: 5px 15px; margin: 15px 0 10px; }
-        .glosario-mini { font-size: 9px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .pdf-section-title { font-family: 'Cinzel', serif; color: var(--purpura); background: var(--purpura-luz); margin: 12px 0 8px; font-size: 13px; padding: 6px 15px; border-left: 4px solid var(--oro); text-transform: uppercase; }
+        .pdf-text { font-size: 11px; line-height: 1.5; text-align: justify; color: #444; }
+        .negrita { font-weight: 700; color: var(--purpura); }
 
-        .footer { margin-top: auto; text-align: center; border-top: 1px solid var(--purpura-luz); padding-top: 10px; }
-        .clara-sig { font-family: 'Great Vibes'; font-size: 28px; color: var(--purpura); margin: 0; }
+        /* RECUADRO FOTO 10x15 */
+        .photo-frame { width: 150mm; height: 100mm; margin: 15px auto; border: 1px solid var(--oro); overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f9f9f9; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .photo-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .bovis-display { display: flex; justify-content: space-between; background: var(--crema); padding: 15px; border-radius: 10px; margin: 10px 0; }
+        .bovis-box { text-align: center; width: 45%; }
+        .bovis-box b { font-size: 20px; color: var(--purpura); display: block; }
+
+        .footer-sig { text-align: center; margin-top: auto; padding-top: 20px; }
+        .sig-name { font-family: 'Great Vibes', cursive; font-size: 32px; color: var(--purpura); margin: 0; }
     </style>
 </head>
 <body>
 
 <div class="admin-panel">
-    <h2 style="font-family: 'Cinzel'; color: var(--purpura);">Sanación 11.11 - Reporte Visual</h2>
+    <h2>Editor Sanación 11.11 - Reporte Completo</h2>
     <div class="grid">
         <div><label>Consultante</label><input id="nombre" value="Tatiana Zayas"></div>
-        <div><label>Fecha</label><input id="fecha" value="06/03/1993"></div>
-        <div style="grid-column: span 2;"><label>Foto de la Tirada</label><input type="file" accept="image/*" onchange="loadImg(event)"></div>
+        <div><label>Fecha de Nacimiento</label><input id="fecha" value="06/03/1993"></div>
+        
+        <div style="grid-column: span 2;"><label>Foto de la Tirada (Se ajustará a 10x15cm)</label><input type="file" accept="image/*" onchange="loadImg(event)"></div>
+        
+        <div style="grid-column: span 2;"><label>Lectura Evolutiva (Tu interpretación)</label><textarea id="lectura" rows="4"></textarea></div>
+        
         <div><label>Bovis Inicial</label><input id="bIni" value="3.000"></div>
         <div><label>Bovis Final</label><input id="bFin" value="45.000"></div>
-        
+
         <div style="grid-column: span 2;">
-            <label>Limpiezas Realizadas (Se explican solas en el PDF)</label>
+            <label>Desbloqueos Realizados</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; font-size: 11px;">
-                <label><input type="checkbox" id="chk_ag" checked> Agresiones</label>
+                <label><input type="checkbox" id="chk_ag" checked> Agresiones Psico.</label>
                 <label><input type="checkbox" id="chk_mo" checked> Mal de Ojo</label>
                 <label><input type="checkbox" id="chk_en" checked> Envidia</label>
                 <label><input type="checkbox" id="chk_mps" checked> Magia Psíquica</label>
+                <label><input type="checkbox" id="chk_mri"> Magia Ritual</label>
                 <label><input type="checkbox" id="chk_de" checked> Desencarnados</label>
+                <label><input type="checkbox" id="chk_ei"> Espíritu Invasor</label>
                 <label><input type="checkbox" id="chk_ba" checked> Bajo Astral</label>
+                <label><input type="checkbox" id="chk_pa" checked> Palacio Cristal</label>
             </div>
         </div>
+
+        <div>
+            <label>Síntesis (Enfoque)</label>
+            <select id="selSintesis" onchange="document.getElementById('out_sin').value = this.value">
+                <option value="">-- Seleccionar Perspectiva --</option>
+                <option value="Desde lo Espiritual: Tu alma ha dado un salto cuántico hoy. Has recuperado fragmentos de tu esencia que estaban dispersos, permitiendo que tu luz original vuelva a guiar tu camino sin interferencias externas.">Espiritual</option>
+                <option value="Desde lo Emocional: Se ha liberado una carga ancestral que pesaba en tu corazón. Hoy comienza un periodo de alivio donde tus decisiones nacerán desde la paz y no desde el miedo acumulado.">Emocional</option>
+                <option value="Desde el Poder Personal: Has recuperado el mando de tu campo energético. Al limpiar las larvas y parásitos astrales, tu voluntad se fortalece, permitiéndote concretar proyectos que antes sentías frenados.">Poder</option>
+            </select>
+            <textarea id="out_sin" rows="3" style="margin-top:5px;"></textarea>
+        </div>
+
+        <div>
+            <label>Recomendaciones Pro</label>
+            <select id="selRec" onchange="document.getElementById('out_rec').value = this.value">
+                <option value="">-- Seleccionar Protocolo --</option>
+                <option value="Protocolo de Sellado: Realizar durante 3 días un baño con sal gruesa y hojas de laurel. Al terminar, visualiza una esfera dorada que rodea todo tu cuerpo, decretando: 'Mi campo es impenetrable y solo el amor reside en mí'.">Sellado Áurico</option>
+                <option value="Protocolo de Elevación: Evita discusiones o ambientes densos por 48hs. Escucha frecuencias 528Hz al dormir para permitir que tus células se recalibren con la nueva vibración de 45.000 Bovis lograda.">Vibración Alta</option>
+            </select>
+            <textarea id="out_rec" rows="3" style="margin-top:5px;"></textarea>
+        </div>
     </div>
-    <button class="btn-magic" onclick="renderPDF()">GENERAR PDF VISUAL (2 HOJAS)</button>
+    <button class="btn-magic" onclick="renderPDF()">GENERAR PDF 3 HOJAS CON FOTO</button>
 </div>
 
 <div id="pdf-render-area">
     <div class="pdf-page" id="hoja1">
         <div class="inner-border">
-            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Lectura Evolutiva</p></div>
-            <div style="font-size: 12px; margin-bottom: 10px;">
-                <span style="color: var(--oro)">Consultante:</span> <b id="p1_n"></b> | 
-                <span style="color: var(--oro)">Fecha:</span> <b id="p1_f"></b>
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Lectura Evolutiva de Cartas</p></div>
+            <div class="pdf-text">
+                <p><span class="negrita">Consultante:</span> <span id="p1_nombre"></span> | <span class="negrita">Fecha:</span> <span id="p1_fecha"></span></p>
+                <p>Esta lectura busca brindarte claridad y consciencia para que puedas <span class="negrita">accionar sobre tu presente</span> y transformar tu futuro.</p>
             </div>
-            <div class="photo-main"><img id="outFoto" src=""></div>
-            <p style="font-size: 11px; text-align: center; font-style: italic; color: #666; margin-top: auto;">
-                "Las cartas no dictan tu destino, iluminan tu camino para que tomes el mando de tu presente."
-            </p>
+            
+            <div class="pdf-section-title">Guía de Lectura</div>
+            <div class="pdf-text" style="font-size: 10px;">
+                <b>Presente:</b> Refleja tu realidad inmediata. <b>Futuro:</b> Muestra las tendencias y posibles desarrollos. 
+                <b>Propósito:</b> Brindarte consciencia para transformar tu realidad.
+            </div>
+
+            <div class="photo-frame"><img id="outFoto" src=""></div>
+
+            <div class="pdf-section-title">Tu Devolución</div>
+            <div id="p1_lectura" class="pdf-text" style="font-style: italic; border-left: 2px solid var(--purpura-luz); padding-left: 10px;"></div>
         </div>
     </div>
 
     <div class="pdf-page" id="hoja2">
         <div class="inner-border">
-            <div class="pdf-header"><h1>ARMONIZACIÓN</h1><p>Péndulo Karnak & Sistema de 12 Chakras</p></div>
-            
-            <div class="bovis-row">
-                <div class="bovis-item"><small>FRECUENCIA INICIAL</small><b id="p2_bi"></b></div>
-                <div style="font-size: 20px; color: var(--oro); align-self: center;">➔</div>
-                <div class="bovis-item"><small>FRECUENCIA FINAL</small><b id="p2_bf"></b></div>
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Armonización Energética</p></div>
+            <div class="pdf-text">
+                <p>El <span class="negrita">Péndulo Karnak</span> permite detectar y transmutar energías negativas. Su vibración armoniza los desequilibrios antes de que afecten el plano físico.</p>
             </div>
-
-            <div class="pdf-section-title">SISTEMA DE 12 CHAKRAS ARMONIZADOS</div>
-            <div class="chakra-system">
-                <div class="chakra-list">
-                    <p>✨ <b>Estrella del Alma:</b> Conexión espiritual superior.</p>
-                    <p>✨ <b>Corona:</b> Sabiduría y conexión divina.</p>
-                    <p>✨ <b>Tercer Ojo:</b> Intuición y visión clara.</p>
-                    <p>✨ <b>Laríngeo:</b> Comunicación y verdad.</p>
-                    <p>✨ <b>Corazón Etérico:</b> Sanación profunda.</p>
-                    <p>✨ <b>Corazón:</b> Amor incondicional y perdón.</p>
-                </div>
-                <div class="chakra-list">
-                    <p>✨ <b>Plexo Solar:</b> Poder personal y voluntad.</p>
-                    <p>✨ <b>Sacro:</b> Creatividad y emociones.</p>
-                    <p>✨ <b>Raíz:</b> Seguridad y enraizamiento.</p>
-                    <p>✨ <b>Palmares:</b> Capacidad de dar y recibir.</p>
-                    <p>✨ <b>Elementales:</b> Conexión con la naturaleza.</p>
-                    <p>✨ <b>Estrella de Gaïa:</b> Anclaje a la Tierra.</p>
-                </div>
+            <div class="pdf-section-title">Frecuencia (Bovis)</div>
+            <div class="bovis-display">
+                <div class="bovis-box"><small>Inicial</small><b id="p2_bini"></b></div>
+                <div style="font-size: 24px; color: var(--oro);">✧</div>
+                <div class="bovis-box"><small>Final</small><b id="p2_bfin"></b></div>
             </div>
+            <div class="pdf-section-title">Desbloqueos Realizados</div>
+            <div id="p2_glosario" class="pdf-text" style="font-size: 10px;"></div>
+        </div>
+    </div>
 
-            <div class="pdf-section-title">DETALLE DE LIMPIEZA ENERGÉTICA</div>
-            <div id="p2_detalles" class="glosario-mini"></div>
-
-            <div class="footer">
-                <p class="clara-sig">Clara</p>
-                <p style="font-size: 11px; margin: 0; font-weight: 600; color: var(--purpura);">Sanación 11.11 | Mar del Plata</p>
-                <p style="font-size: 10px; color: #888;">+54 9 223 593-1151 | @sanacion11.11</p>
+    <div class="pdf-page" id="hoja3">
+        <div class="inner-border">
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Integración Final</p></div>
+            <div class="pdf-section-title">SÍNTESIS</div>
+            <div id="p3_sin" class="pdf-text" style="background: var(--purpura-luz); padding: 15px; border-radius: 8px; font-style: italic;"></div>
+            <div class="pdf-section-title">AUTOCUIDADO</div>
+            <div id="p3_rec" class="pdf-text" style="color: var(--oro); font-weight: 600; margin-top: 10px;"></div>
+            <div class="footer-sig">
+                <p class="sig-name">Clara</p>
+                <p style="font-size: 12px; font-weight: bold; color: var(--purpura); margin: 0;">Sanación 11.11 | Mar del Plata</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+let imgData = "";
 function loadImg(e) {
     const reader = new FileReader();
     reader.onload = () => { document.getElementById('outFoto').src = reader.result; }
     reader.readAsDataURL(e.target.files[0]);
 }
 
-const INFO = {
-    chk_ag: ["Agresiones Psicodinámicas", "Eliminación de autoataques mentales y bloqueos internos."],
-    chk_mo: ["Mal de Ojo", "Transmutación de proyecciones negativas externas."],
-    chk_en: ["Envidia", "Limpieza de cargas densas de terceros."],
-    chk_mps: ["Magia Psíquica", "Liberación de influencias mentales ajenas."],
-    chk_de: ["Desencarnados", "Elevación de energías no trascendidas."],
-    chk_ba: ["Bajo Astral", "Cierre de portales y frecuencias de miedo."]
+const DESCRIPCIONES = {
+    chk_ag: ["Agresiones Psicodinámicas", "Pensamientos o emociones internas (enojo, culpa) que actúan como un 'autoataque' bloqueando tu energía."],
+    chk_mo: ["Mal de Ojo", "Energía negativa proyectada por otros que afecta tu bienestar."],
+    chk_en: ["Envidia", "Cargas de baja vibración que actúan como lastre en tus proyectos."],
+    chk_mps: ["Magia Psíquica", "Influencia mental no consciente que altera tu estado anímico."],
+    chk_mri: ["Magia Ritual", "Trabajos intencionados que bloquean el flujo de armonía."],
+    chk_de: ["Desencarnados", "Almas que no han trascendido y drenan tu energía vital."],
+    chk_ei: ["Espíritu Invasor", "Entidades que nublan tu intuición y generan cansancio."],
+    chk_ba: ["Bajo Astral", "Frecuencias de miedo o dolor que atraen situaciones de conflicto."],
+    chk_pa: ["Palacio de Cristal", "Tu estructura energética pura, ahora restaurada a su brillo original."]
 };
 
 async function renderPDF() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    document.getElementById("p1_nombre").innerText = document.getElementById("nombre").value;
+    document.getElementById("p1_fecha").innerText = document.getElementById("fecha").value;
+    document.getElementById("p1_lectura").innerText = document.getElementById("lectura").value;
+    document.getElementById("p2_bini").innerText = document.getElementById("bIni").value;
+    document.getElementById("p2_bfin").innerText = document.getElementById("bFin").value;
+    document.getElementById("p3_sin").innerText = document.getElementById("out_sin").value;
+    document.getElementById("p3_rec").innerText = "✨ " + document.getElementById("out_rec").value;
 
-    document.getElementById("p1_n").innerText = document.getElementById("nombre").value;
-    document.getElementById("p1_f").innerText = document.getElementById("fecha").value;
-    document.getElementById("p2_bi").innerText = document.getElementById("bIni").value;
-    document.getElementById("p2_bf").innerText = document.getElementById("bFin").value;
-
-    let htmlDetalle = "";
-    for(let key in INFO) {
-        if(document.getElementById(key).checked) {
-            htmlDetalle += `<div style="border-bottom: 1px solid #eee; padding: 3px;"><b>${INFO[key][0]}:</b> ${INFO[key][1]}</div>`;
+    let glosarioHTML = "";
+    for (let id in DESCRIPCIONES) {
+        if (document.getElementById(id).checked) {
+            glosarioHTML += `<p><b>${DESCRIPCIONES[id][0]}:</b> ${DESCRIPCIONES[id][1]}</p>`;
         }
     }
-    document.getElementById("p2_detalles").innerHTML = htmlDetalle;
+    document.getElementById("p2_glosario").innerHTML = glosarioHTML;
 
-    const hojas = ["hoja1", "hoja2"];
+    const hojas = ["hoja1", "hoja2", "hoja3"];
     for(let i=0; i<hojas.length; i++) {
         const canvas = await html2canvas(document.getElementById(hojas[i]), { scale: 3 });
+        const img = canvas.toDataURL('image/jpeg', 0.95);
         if(i > 0) pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297);
+        pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
     }
-    pdf.save(`Sanacion_Visual_${document.getElementById("nombre").value}.pdf`);
+    pdf.save(`Sanacion_11.11_${document.getElementById("nombre").value}.pdf`);
 }
 </script>
 </body>
