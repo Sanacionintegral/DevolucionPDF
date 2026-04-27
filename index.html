@@ -2,62 +2,58 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sanación 11.11 - Sistema de Devolución Premium</title>
+    <title>Sanación 11.11 - Sistema de Devolución Premium v2.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
 
     <style>
+        /* [Los mismos estilos del Admin Panel se mantienen] */
         :root { --oro: #c5a059; --purpura: #4a1e4a; --crema: #fdfaf6; }
         body { font-family: 'Montserrat', sans-serif; background: #1a1a1a; color: #333; padding: 20px; }
-        
         .admin-panel { max-width: 900px; background: white; padding: 40px; border-radius: 25px; margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         h2 { font-family: 'Cinzel', serif; color: var(--purpura); text-align: center; border-bottom: 2px solid var(--oro); padding-bottom: 10px; margin-bottom: 30px; }
-        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
         label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--purpura); font-size: 13px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; }
-
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box;}
         .checkbox-container { grid-column: span 2; background: #fdfaf6; padding: 20px; border-radius: 15px; border: 1px solid #eee; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .check-item { display: flex; align-items: center; font-size: 13px; }
         .check-item input { width: auto; margin-right: 10px; margin-bottom: 0; }
-
-        .btn-magic { grid-column: span 2; background: var(--purpura); color: white; padding: 20px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.4s; margin-top: 20px; font-family: 'Cinzel', serif; }
+        .btn-magic { grid-column: span 2; background: var(--purpura); color: white; padding: 20px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.4s; margin-top: 20px; font-family: 'Cinzel', serif; width: 100%;}
         .btn-magic:hover { background: var(--oro); transform: scale(1.02); }
+        .img-preview { max-width: 100%; height: 200px; object-fit: contain; margin-top: 10px; border: 2px dashed var(--oro); border-radius: 10px; display: none;}
 
-        /* DISEÑO PDF PROFESIONAL */
-        #pdf-container { width: 210mm; min-height: 297mm; padding: 15mm; background: var(--crema); position: absolute; left: -9999px; }
-        .pdf-page { background: white; border: 1px solid var(--oro); padding: 15mm; height: 265mm; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.05); }
+        /* DISEÑO PDF v2.0 - Corregido para evitar estiramientos y superposiciones */
+        #pdf-container { width: 210mm; background: var(--crema); position: absolute; left: -9999px; }
+        .pdf-page-content { background: white; border: 1px solid var(--oro); padding: 15mm; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.05); }
         .pdf-header { text-align: center; margin-bottom: 20px; }
         .pdf-header h1 { font-family: 'Cinzel', serif; color: var(--purpura); margin: 0; font-size: 30px; letter-spacing: 4px; }
         .pdf-header p { color: var(--oro); text-transform: uppercase; letter-spacing: 2px; font-size: 10px; margin-top: 5px; }
-        
         .pdf-section { margin-bottom: 15px; }
-        .pdf-section-title { font-family: 'Cinzel', serif; color: var(--purpura); border-bottom: 1px solid var(--oro); margin-bottom: 8px; font-size: 14px; padding-bottom: 3px; }
+        .pdf-section-title { font-family: 'Cinzel', serif; color: var(--purpura); border-bottom: 1px solid var(--oro); margin-bottom: 8px; font-size: 14px; padding-bottom: 3px; text-transform: uppercase;}
         .pdf-text { font-size: 12px; line-height: 1.5; text-align: justify; color: #444; }
-        
         .bovis-table { display: flex; justify-content: space-around; background: #f9f4f9; border-radius: 10px; padding: 10px; margin: 10px 0; border: 1px solid #eee; }
         .bovis-val { text-align: center; }
         .bovis-val small { font-size: 9px; display: block; color: #888; }
         .bovis-val b { font-size: 18px; color: var(--purpura); }
-
         .glosario-item { margin-bottom: 8px; border-left: 2px solid var(--oro); padding-left: 10px; }
         .glosario-item b { color: var(--purpura); font-size: 12px; }
         .glosario-item p { margin: 2px 0 0 0; font-size: 11px; font-style: italic; color: #666; }
-
-        .img-preview { max-width: 100%; height: 200px; object-fit: contain; margin-top: 10px; border: 2px dashed var(--oro); border-radius: 10px; }
-        .pdf-img { width: 100%; max-height: 60mm; object-fit: contain; margin: 10px 0; border-radius: 5px; }
         
-        .signature-box { position: absolute; bottom: 15mm; left: 0; right: 0; text-align: center; }
+        /* Ajuste de imagen v2.0: No estira */
+        .pdf-img-container { width: 100%; text-align: center; margin: 10px 0; max-height: 80mm; overflow: hidden; display: none; }
+        .pdf-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        /* Firma v2.0: No fija, se mueve con el texto */
+        .signature-box-v2 { text-align: center; margin-top: 25mm; border-top: 1px solid #eee; padding-top: 10mm; }
         .sig-name { font-family: 'Great Vibes', cursive; font-size: 32px; color: var(--purpura); margin: 0; }
     </style>
 </head>
 <body>
 
 <div class="admin-panel">
-    <h2>Generador Sanación 11.11 Premium</h2>
-    
+    <h2>Generador Sanación 11.11 Premium v2.0</h2>
     <div class="grid">
         <div>
             <label>Nombre del Consultante</label>
@@ -67,15 +63,13 @@
             <label>Fecha (Solo números)</label>
             <input id="fecha" placeholder="Ej: 06031993" maxlength="8">
         </div>
-
         <div style="grid-column: span 2;">
             <label>Lectura Evolutiva (Interpretación)</label>
             <textarea id="lectura" rows="4" placeholder="Describe los arquetipos y mensajes recibidos..."></textarea>
             <label>Foto de la tirada</label>
             <input type="file" id="fotoInput" accept="image/*" onchange="previewImage(event)">
-            <img id="prev" class="img-preview" style="display:none;">
+            <img id="prev" class="img-preview">
         </div>
-
         <div>
             <label>Bovis Inicial</label>
             <input id="bIni" placeholder="Ej: 3.000">
@@ -84,7 +78,6 @@
             <label>Bovis Final</label>
             <input id="bFin" placeholder="Ej: 9.000">
         </div>
-
         <div class="checkbox-container">
             <label>Limpieza Péndulo Karnak (Tildá lo detectado)</label>
             <div class="check-grid">
@@ -98,9 +91,8 @@
                 <div class="check-item"><input type="checkbox" id="k8" value="Bajo Astral" data-desc="Frecuencias de miedo o dolor que bajan tu vibración y atraen bloqueos."> Bajo Astral</div>
             </div>
         </div>
-
         <div style="grid-column: span 2;">
-            <label>Síntesis del Corazón (Seleccionar o escribir)</label>
+            <label>Síntesis (Seleccionar o escribir)</label>
             <select onchange="document.getElementById('manualSintesis').value = this.value">
                 <option value="">-- Elige un mensaje con alma --</option>
                 <option value="Tu alma ha hablado hoy para recordarte que eres un ser de luz infinita. Este proceso no es solo una limpieza, es un renacer. Permítete brillar sin miedo, el universo ya ha abierto las puertas que creías cerradas.">Mensaje de Renacimiento</option>
@@ -109,7 +101,6 @@
             </select>
             <textarea id="manualSintesis" rows="3" style="margin-top:10px;"></textarea>
         </div>
-
         <div style="grid-column: span 2;">
             <label>Recomendaciones Post-Sesión</label>
             <select onchange="document.getElementById('manualRec').value = this.value">
@@ -121,12 +112,11 @@
             <textarea id="manualRec" rows="2" style="margin-top:10px;"></textarea>
         </div>
     </div>
-
-    <button class="btn-magic" onclick="generarTodo()">GENERAR REPORTE SAGRADO PDF</button>
+    <button class="btn-magic" onclick="generarTodo()">GENERAR REPORTE SAGRADO PDF (v2.0)</button>
 </div>
 
 <div id="pdf-container">
-    <div class="pdf-page">
+    <div class="pdf-page-content">
         <div class="pdf-header">
             <h1>SANACIÓN 11.11</h1>
             <p>Reporte de Evolución y Armonización Energética</p>
@@ -140,7 +130,9 @@
         <div class="pdf-section">
             <div class="pdf-section-title">Lectura Evolutiva</div>
             <div id="outLectura" class="pdf-text"></div>
-            <img id="outFoto" class="pdf-img" style="display:none;">
+            <div id="outFotoContainer" class="pdf-img-container">
+                <img id="outFoto" class="pdf-img">
+            </div>
         </div>
 
         <div class="pdf-section">
@@ -158,7 +150,7 @@
         </div>
 
         <div class="pdf-section">
-            <div class="pdf-section-title">Mensaje del Alma</div>
+            <div class="pdf-section-title">SÍNTESIS DE LA SESIÓN</div>
             <div id="outSintesis" class="pdf-text" style="font-style: italic; color: var(--purpura); background: #fdfaf6; padding: 10px; border-radius: 5px;"></div>
         </div>
 
@@ -167,16 +159,16 @@
             <div id="outRec" class="pdf-text" style="color: var(--oro); font-weight: 600;"></div>
         </div>
 
-        <div class="signature-box">
+        <div class="signature-box-v2">
             <p class="sig-name">Clara</p>
-            <p style="font-size: 10px; font-weight: bold; margin:0;">Sanación 11.11 | Mar del Plata</p>
-            <p style="font-size: 9px; color: #888;">+54 9 223 593-1151 | @sanacion11.11</p>
+            <p style="font-size: 10px; font-weight: bold; margin:0; color: #444;">Sanación 11.11 | Mar del Plata</p>
+            <p style="font-size: 9px; color: #888; margin-top:2px;">+54 9 223 593-1151 | @sanacion11.11</p>
         </div>
     </div>
 </div>
 
 <script>
-// Auto-formato de fecha
+// Auto-formato de fecha (Mismo script)
 document.getElementById('fecha').addEventListener('input', function (e) {
     let v = e.target.value.replace(/\D/g, '');
     if (v.length >= 8) {
@@ -190,45 +182,69 @@ function previewImage(event) {
         const prev = document.getElementById('prev');
         prev.src = reader.result;
         prev.style.display = 'block';
-        document.getElementById('outFoto').src = reader.result;
-        document.getElementById('outFoto').style.display = 'block';
+        
+        const outFoto = document.getElementById('outFoto');
+        const outFotoCont = document.getElementById('outFotoContainer');
+        outFoto.src = reader.result;
+        outFotoCont.style.display = 'block';
     }
     reader.readAsDataURL(event.target.files[0]);
 }
 
-function generarTodo() {
+// NUEVA FUNCIÓN DE GENERACIÓN v2.0
+async function generarTodo() {
     const { jsPDF } = window.jspdf;
-    
-    // Pasar datos al PDF
-    document.getElementById("outNombre").innerText = document.getElementById("nombre").value;
-    document.getElementById("outFecha").innerText = document.getElementById("fecha").value;
-    document.getElementById("outLectura").innerText = document.getElementById("lectura").value;
-    document.getElementById("outBIni").innerText = document.getElementById("bIni").value;
-    document.getElementById("outBFin").innerText = document.getElementById("bFin").value;
-    document.getElementById("outSintesis").innerText = document.getElementById("manualSintesis").value;
-    document.getElementById("outRec").innerText = "✨ " + document.getElementById("manualRec").value;
+    const btn = document.querySelector('.btn-magic');
+    btn.innerText = "Calculando energía y generando PDF...";
+    btn.disabled = true;
 
-    // Glosario dinámico
+    // Pasar datos al PDF (Mismo mapeo)
+    document.getElementById("outNombre").innerText = document.getElementById("nombre").value || 'No especificado';
+    document.getElementById("outFecha").innerText = document.getElementById("fecha").value || '--/--/----';
+    document.getElementById("outLectura").innerText = document.getElementById("lectura").value || 'No se registraron cartas en esta sesión.';
+    document.getElementById("outBIni").innerText = document.getElementById("bIni").value || '--';
+    document.getElementById("outBFin").innerText = document.getElementById("bFin").value || '--';
+    document.getElementById("outSintesis").innerText = document.getElementById("manualSintesis").value || 'No se registró síntesis.';
+    document.getElementById("outRec").innerText = document.getElementById("manualRec").value ? "✨ " + document.getElementById("manualRec").value : 'Observa tu descanso y mantente hidratado.';
+
+    // Glosario dinámico (Mismo script)
     let glosarioHtml = "Durante la sesión se detectaron y transmutaron con éxito:<br><br>";
     let hayChecks = false;
     document.querySelectorAll('.check-grid input:checked').forEach(c => {
         hayChecks = true;
         glosarioHtml += `<div class="glosario-item"><b>${c.value}:</b> <p>${c.getAttribute('data-desc')}</p></div>`;
     });
-    
-    if(!hayChecks) glosarioHtml = "Campo energético armónico sin interferencias externas detectadas.";
+    if(!hayChecks) glosarioHtml = "Campo energético armónico sin interferencias externas detectadas en este plano.";
     document.getElementById("outGlosario").innerHTML = glosarioHtml;
 
-    // Generación con retraso para asegurar carga de imágenes
-    setTimeout(() => {
-        const container = document.getElementById("pdf-container");
-        html2canvas(container, { scale: 2.5, useCORS: true }).then(canvas => {
-            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-            pdf.save(`Sanacion_11.11_${document.getElementById("nombre").value}.pdf`);
-        });
-    }, 500);
+    const container = document.getElementById("pdf-container");
+    
+    // Pequeño retraso para asegurar que los textos largos se acomoden y la imagen cargue
+    await new Promise(r => setTimeout(r, 800));
+
+    // html2canvas con alta escala para calidad de impresión
+    html2canvas(container, { 
+        scale: 3, 
+        useCORS: true, 
+        logging: false, 
+        windowHeight: container.scrollHeight, 
+        windowWidth: 210 * 3.78 // Medida A4 en pixeles
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        // Ajuste de la imagen al PDF sin estiramiento (se estira el canvas completo, no el contenido)
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        
+        const nombreVal = document.getElementById("nombre").value.replace(/ /g, "_") || 'Consultante';
+        pdf.save(`Sanacion_11.11_${nombreVal}.pdf`);
+        
+        btn.innerText = "GENERAR REPORTE SAGRADO PDF (v2.0)";
+        btn.disabled = false;
+    });
 }
 </script>
 
