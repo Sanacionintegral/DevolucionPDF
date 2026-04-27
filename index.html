@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sanación 11.11 - Generador PDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #fbe4ec;
+    padding: 20px;
+}
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+input, select, textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+button {
+    padding: 12px;
+    width: 100%;
+    background: #a64ca6;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Generador de Informe</h2>
+
+<input id="nombre" placeholder="Nombre del consultante">
+
+<select id="intro">
+<option>Durante la sesión se exploró el estado energético actual, identificando bloqueos importantes.</option>
+<option>En esta lectura se observó cómo tu energía se encontraba en el presente y su proyección futura.</option>
+<option>La sesión permitió acceder a información profunda sobre tu estado energético actual.</option>
+<option>Se realizó una lectura evolutiva para comprender el origen de lo que hoy estás sintiendo.</option>
+<option>Se identificaron patrones energéticos que estaban generando desequilibrio.</option>
+</select>
+
+<input id="signo" placeholder="Signo (Ej: Aries - Presente)">
+<textarea id="diagnostico" placeholder="Diagnóstico / interpretación"></textarea>
+
+<h4>Sanación detectada</h4>
+<label><input type="checkbox" value="Mal de ojo"> Mal de ojo</label><br>
+<label><input type="checkbox" value="Envidia"> Envidia</label><br>
+<label><input type="checkbox" value="Bajo astral"> Bajo astral</label><br>
+<label><input type="checkbox" value="Conectores"> Conectores</label><br>
+<label><input type="checkbox" value="Desencarnados"> Desencarnados</label><br>
+
+<h4>Chakras trabajados</h4>
+<label><input type="checkbox" value="Corazón"> Corazón</label><br>
+<label><input type="checkbox" value="Tercer ojo"> Tercer ojo</label><br>
+<label><input type="checkbox" value="Corona"> Corona</label><br>
+
+<input id="bovisInicial" placeholder="Bovis inicial">
+<input id="bovisFinal" placeholder="Bovis final">
+
+<textarea id="conclusion" placeholder="Conclusión"></textarea>
+
+<select id="frase">
+<option>Cuando sanás tu pasado, tu presente florece y tu futuro se abre con luz.</option>
+<option>Todo lo que liberás hoy, deja espacio para lo nuevo.</option>
+<option>Tu energía en equilibrio es tu mayor poder.</option>
+<option>Sanar es recordar quién sos sin cargas.</option>
+<option>Lo que hoy comprendés, mañana deja de doler.</option>
+</select>
+
+<button onclick="generarPDF()">Generar PDF</button>
+
+</div>
+
+<script>
+async function generarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let nombre = document.getElementById("nombre").value;
+    let intro = document.getElementById("intro").value;
+    let signo = document.getElementById("signo").value;
+    let diagnostico = document.getElementById("diagnostico").value;
+    let conclusion = document.getElementById("conclusion").value;
+    let frase = document.getElementById("frase").value;
+
+    let bovisInicial = document.getElementById("bovisInicial").value;
+    let bovisFinal = document.getElementById("bovisFinal").value;
+
+    let sanaciones = [];
+    document.querySelectorAll('input[type=checkbox]:checked').forEach(el => {
+        sanaciones.push(el.value);
+    });
+
+    doc.setFont("Helvetica");
+
+    let y = 10;
+
+    doc.text("Informe de Sanación Energética", 10, y);
+    y += 10;
+
+    doc.text("Nombre: " + nombre, 10, y);
+    y += 10;
+
+    doc.text(intro, 10, y, { maxWidth: 180 });
+    y += 15;
+
+    doc.text("Lectura Evolutiva:", 10, y);
+    y += 7;
+    doc.text(signo, 10, y);
+    y += 7;
+    doc.text(diagnostico, 10, y, { maxWidth: 180 });
+    y += 15;
+
+    doc.text("Sanación detectada:", 10, y);
+    y += 7;
+    doc.text(sanaciones.join(", "), 10, y, { maxWidth: 180 });
+    y += 15;
+
+    doc.text("Nivel energético (Bovis):", 10, y);
+    y += 7;
+    doc.text("Inicial: " + bovisInicial, 10, y);
+    y += 7;
+    doc.text("Final: " + bovisFinal, 10, y);
+    y += 15;
+
+    doc.text("Conclusión:", 10, y);
+    y += 7;
+    doc.text(conclusion, 10, y, { maxWidth: 180 });
+    y += 20;
+
+    doc.text(frase, 10, y, { maxWidth: 180 });
+    y += 20;
+
+    doc.text("Con amor,", 10, y);
+    y += 7;
+    doc.text("Clara – Sanación 11.11", 10, y);
+    y += 7;
+    doc.text("+54 9 223 593-1151", 10, y);
+
+    doc.save(nombre + "_informe.pdf");
+}
+</script>
+
+</body>
+</html>
