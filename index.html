@@ -2,56 +2,76 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Sanación 11.11</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
-    font-family: Arial;
-    background: #f9e6ee;
+    font-family: 'Georgia', serif;
+    background: #f7e4ec;
     padding: 20px;
 }
-.container {
-    max-width: 600px;
-    margin: auto;
-}
-input, select, textarea {
+
+input, textarea, select {
     width: 100%;
     margin-bottom: 10px;
     padding: 8px;
 }
+
 button {
-    padding: 12px;
     width: 100%;
-    background: #8e3a8e;
+    padding: 12px;
+    background: #7a2c7a;
     color: white;
     border: none;
-    cursor: pointer;
+}
+
+/* DISEÑO PDF */
+#pdf {
+    width: 800px;
+    padding: 50px;
+    background: linear-gradient(#fff0f5, #ffffff);
+}
+
+h1 {
+    color: #7a2c7a;
+    text-align: center;
+}
+
+.section {
+    background: white;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+
+.title {
+    font-weight: bold;
+    color: #7a2c7a;
+    margin-bottom: 10px;
+}
+
+.quote {
+    text-align: center;
+    font-style: italic;
+    margin-top: 30px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<h2>Sanación 11.11 - Informe Premium</h2>
+<h2>Generador Nivel Dios</h2>
 
 <input id="nombre" placeholder="Nombre del consultante">
 
-<select id="intro">
-<option>Durante la sesión se identificaron bloqueos energéticos que estaban afectando tu equilibrio.</option>
-<option>Se accedió a información profunda sobre tu estado energético actual.</option>
-<option>La lectura permitió comprender el origen de lo que estás sintiendo.</option>
-</select>
-
-<input id="signo" placeholder="Zona / Signo">
-<textarea id="diagnostico" placeholder="Interpretación"></textarea>
+<textarea id="lectura" placeholder="Lectura evolutiva (interpretación)"></textarea>
 
 <input id="bovisInicial" placeholder="Bovis inicial">
 <input id="bovisFinal" placeholder="Bovis final">
 
-<textarea id="conclusion" placeholder="Conclusión"></textarea>
+<textarea id="conclusion" placeholder="Conclusión final"></textarea>
 
 <select id="frase">
 <option>Cuando sanás tu pasado, tu presente florece y tu futuro se abre con luz.</option>
@@ -59,90 +79,90 @@ button {
 <option>Tu energía en equilibrio es tu mayor poder.</option>
 </select>
 
-<button onclick="generarPDF()">Generar PDF</button>
+<button onclick="generar()">Generar PDF</button>
+
+<!-- DISEÑO -->
+<div id="pdf" style="position:absolute; left:-9999px;">
+
+<h1>Sanación 11.11</h1>
+<p style="text-align:center;">Informe energético personalizado</p>
+
+<div class="section">
+<div class="title">Consultante</div>
+<div id="outNombre"></div>
+</div>
+
+<div class="section">
+<div class="title">Lectura Evolutiva</div>
+<div id="outLectura"></div>
+</div>
+
+<div class="section">
+<div class="title">Sanación con Péndulo Karnak</div>
+<div id="outKarnak"></div>
+</div>
+
+<div class="section">
+<div class="title">Nivel Energético</div>
+<div id="outBovis"></div>
+</div>
+
+<div class="section">
+<div class="title">Conclusión</div>
+<div id="outConclusion"></div>
+</div>
+
+<div class="quote" id="outFrase"></div>
+
+<p style="margin-top:40px;">
+Con amor,<br>
+Clara – Sanación 11.11<br>
++54 9 223 593-1151
+</p>
 
 </div>
 
 <script>
-async function generarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+function generar() {
 
-    let nombre = document.getElementById("nombre").value;
-    let intro = document.getElementById("intro").value;
-    let signo = document.getElementById("signo").value;
-    let diagnostico = document.getElementById("diagnostico").value;
-    let conclusion = document.getElementById("conclusion").value;
-    let frase = document.getElementById("frase").value;
-    let bovisInicial = document.getElementById("bovisInicial").value;
-    let bovisFinal = document.getElementById("bovisFinal").value;
+let nombre = document.getElementById("nombre").value;
+let lectura = document.getElementById("lectura").value;
+let conclusion = document.getElementById("conclusion").value;
+let frase = document.getElementById("frase").value;
 
-    let y = 25;
+let bIni = document.getElementById("bovisInicial").value;
+let bFin = document.getElementById("bovisFinal").value;
 
-    // HEADER
-    doc.setFillColor(142, 58, 142);
-    doc.rect(0, 0, 210, 30, "F");
+// TEXTO AUTOMÁTICO KANRAK (PRO)
+let karnak = `
+Durante la sesión se realizó un proceso de limpieza y armonización energética mediante Péndulo Karnak.
 
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(16);
-    doc.text("Sanación 11.11", 10, 15);
+Se detectaron interferencias que estaban afectando el equilibrio emocional, mental y energético, generando una sensación de sobrecarga interna.
 
-    doc.setFontSize(10);
-    doc.text("Informe energético personalizado", 10, 22);
+A lo largo del trabajo, estas cargas fueron liberadas progresivamente, permitiendo una reorganización del campo energético y una mejora en la circulación de la energía vital.
 
-    doc.setTextColor(0,0,0);
+Esto favorece una mayor claridad mental, alivio emocional y una sensación de mayor estabilidad interna.
+`;
 
-    // BLOQUE FUNCION
-    function bloque(titulo, contenido) {
-        doc.setFillColor(245, 220, 230);
-        doc.rect(10, y-5, 190, 20, "F");
+let bovisText = `Nivel inicial: ${bIni} | Nivel final: ${bFin}.
+Se observa una elevación significativa en la frecuencia energética, indicando un campo más fuerte, equilibrado y vital.`;
 
-        doc.setFont(undefined, "bold");
-        doc.text(titulo, 12, y);
+// OUTPUT
+document.getElementById("outNombre").innerText = nombre;
+document.getElementById("outLectura").innerText = lectura;
+document.getElementById("outConclusion").innerText = conclusion;
+document.getElementById("outFrase").innerText = frase;
+document.getElementById("outKarnak").innerText = karnak;
+document.getElementById("outBovis").innerText = bovisText;
 
-        doc.setFont(undefined, "normal");
-        doc.text(contenido, 12, y+6, { maxWidth: 180 });
-
-        y += 22;
-    }
-
-    // NOMBRE
-    doc.setFont(undefined, "bold");
-    doc.text("Consultante: " + nombre, 10, y);
-    y += 10;
-
-    // BLOQUES
-    bloque("Síntesis", intro);
-    bloque("Lectura Evolutiva", signo + " - " + diagnostico);
-    bloque("Nivel Energético (Bovis)", "Inicial: " + bovisInicial + " | Final: " + bovisFinal);
-    bloque("Conclusión", conclusion);
-
-    // FRASE DESTACADA
-    doc.setFont(undefined, "italic");
-    doc.setFontSize(11);
-    doc.text('"' + frase + '"', 20, y+10, { maxWidth: 170 });
-    y += 20;
-
-    // FOOTER
-    doc.setDrawColor(180,180,180);
-    doc.line(10, y, 200, y);
-
-    y += 10;
-
-    doc.setFont(undefined, "normal");
-    doc.text("Con amor,", 10, y);
-
-    y += 6;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Clara – Sanación 11.11", 10, y);
-
-    y += 6;
-
-    doc.setFont(undefined, "normal");
-    doc.text("+54 9 223 593-1151", 10, y);
-
-    doc.save(nombre + "_informe.pdf");
+// EXPORTAR
+html2canvas(document.getElementById("pdf"), {scale:2}).then(canvas=>{
+let img = canvas.toDataURL("image/png");
+let {jsPDF} = window.jspdf;
+let pdf = new jsPDF();
+pdf.addImage(img,'PNG',0,0,210,297);
+pdf.save(nombre+"_informe.pdf");
+});
 }
 </script>
 
