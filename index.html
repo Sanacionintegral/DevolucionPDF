@@ -21,26 +21,26 @@
         #pdf-render-area { position: absolute; left: -9999px; width: 210mm; }
         .pdf-page { width: 210mm; height: 297mm; background: var(--blanco); padding: 12mm; box-sizing: border-box; position: relative; color: var(--texto); overflow: hidden; }
         
-        /* FONDO MARCA DE AGUA */
+        /* CORRECCIÓN MARCA DE AGUA - USANDO ARCHIVO LOCAL DE TU RAIZ */
         .pdf-page::before {
             content: "";
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 500px;
-            height: 500px;
-            background-image: url('https://github.com/Sanacionintegral/DevolucionPDF/blob/main/Para%20fondo%20sello%20de%20agua.jpg?raw=true'); /* Asegúrate de que esta URL sea la correcta */
+            width: 160mm; /* Tamaño ajustado para cubrir gran parte de la hoja */
+            height: 160mm;
+            background-image: url('Para fondo sello de agua.jpg'); 
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            opacity: 0.07;
+            opacity: 0.08; /* Transparencia sutil para que no tape el texto */
             transform: translate(-50%, -50%);
             z-index: 0;
         }
 
         /* REBORDE DORADO */
         .inner-border { 
-            border: 3px double var(--oro); /* Doble línea dorada */
+            border: 3px double var(--oro); 
             height: 100%; 
             padding: 10mm; 
             box-sizing: border-box; 
@@ -48,7 +48,8 @@
             display: flex; 
             flex-direction: column; 
             z-index: 1;
-            background: rgba(255, 255, 255, 0.6); /* Transparencia para ver la marca de agua */
+            /* Se quitó el fondo blanco sólido para que la marca de agua sea visible */
+            background: rgba(255, 255, 255, 0.4); 
         }
         
         .pdf-header { text-align: center; margin-bottom: 10px; border-bottom: 1px solid var(--rosa); padding-bottom: 8px; }
@@ -59,7 +60,6 @@
         .negrita { font-weight: 700; color: var(--rosa-fuerte); }
         .mini-title { font-weight: 700; color: var(--oro); display: block; margin-top: 6px; font-size: 12px; text-transform: uppercase; }
 
-        /* FOTOS PDF */
         .photo-frame { width: 100mm; height: 55mm; margin: 8px auto; border: 1px solid var(--oro); overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.8); }
         .photo-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
@@ -74,6 +74,7 @@
     </style>
 </head>
 <body>
+<!-- EL RESTO DEL CODIGO SIGUE IGUAL (Admin panel, Hojas y Script) -->
 
 <div class="admin-panel">
     <h2 style="font-family: 'Cinzel'; text-align: center; color: var(--rosa-fuerte);">Sanación 11.11 - Generador Premium v3.6</h2>
@@ -280,7 +281,7 @@ async function renderPDF() {
 
         const hojas = ["hoja1", "hoja2", "hoja3", "hoja4", "hoja5"];
         for(let i=0; i<hojas.length; i++) {
-            const canvas = await html2canvas(document.getElementById(hojas[i]), { scale: 2, useCORS: true });
+            const canvas = await html2canvas(document.getElementById(hojas[i]), { scale: 2, useCORS: true, allowTaint: true});
             const img = canvas.toDataURL('image/jpeg', 0.92);
             if(i > 0) pdf.addPage();
             pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
