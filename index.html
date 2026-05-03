@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sanación 11.11 - Reporte Premium v3.8</title>
+    <title>Sanación 11.11 - Reporte Premium</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
@@ -11,107 +11,89 @@
         :root { --oro: #d4af37; --rosa: #fce4ec; --rosa-fuerte: #f06292; --texto: #3e2723; --blanco: #ffffff; }
         body { font-family: 'Montserrat', sans-serif; background: #fdf2f4; color: var(--texto); padding: 20px; }
         
-        .admin-panel { max-width: 1000px; background: white; padding: 40px; border-radius: 25px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--rosa); position: relative; z-index: 10; }
+        /* PANEL DE CONTROL */
+        .admin-panel { max-width: 1000px; background: white; padding: 40px; border-radius: 25px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--rosa); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid var(--rosa); border-radius: 10px; font-family: 'Montserrat'; background: #fffafd; font-size: 14px; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--rosa); border-radius: 10px; font-family: 'Montserrat'; background: #fffafd; }
         label { display: block; font-weight: 600; margin: 10px 0 5px; color: var(--rosa-fuerte); font-size: 13px; text-transform: uppercase; }
         .btn-magic { grid-column: span 2; background: var(--rosa-fuerte); color: white; padding: 20px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 18px; font-family: 'Cinzel', serif; transition: 0.3s; margin-top: 20px; }
         .btn-magic:hover { background: var(--oro); transform: translateY(-2px); }
 
         /* DISEÑO PDF */
         #pdf-render-area { position: absolute; left: -9999px; width: 210mm; }
-        .pdf-page { 
-            width: 210mm; 
-            height: 297mm; 
-            background: var(--blanco); 
-            padding: 10mm; 
-            box-sizing: border-box; 
-            position: relative; 
-            color: var(--texto); 
-            overflow: hidden; 
-        }
+        .pdf-page { width: 210mm; height: 297mm; background: var(--blanco); padding: 10mm; box-sizing: border-box; position: relative; overflow: hidden; }
         
-        /* FONDO DE AGUA CON TU IMAGEN */
+        /* FONDO SELLO DE AGUA */
         .pdf-background {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://r2.erweima.ai/ai_image/17148560010915l9f2066.jpg') center/cover no-repeat;
-            opacity: 0.12; /* Controla qué tan suave se ve el fondo */
-            filter: blur(2px); /* Suaviza la imagen para que el texto resalte */
+            opacity: 0.12;
+            filter: blur(2px);
             z-index: 1;
         }
 
-        .inner-border { 
-            border: 5px double var(--oro); 
-            height: 100%; 
-            padding: 10mm; 
-            box-sizing: border-box; 
-            position: relative; 
-            display: flex; 
-            flex-direction: column;
-            z-index: 2; /* Por encima del fondo */
-            background: rgba(255, 255, 255, 0.6); /* Fondo blanco traslúcido para legibilidad */
-        }
+        .inner-border { border: 5px double var(--oro); height: 100%; padding: 10mm; box-sizing: border-box; position: relative; z-index: 2; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.7); }
         
-        .pdf-header { text-align: center; margin-bottom: 10px; border-bottom: 2px solid var(--rosa-fuerte); padding-bottom: 8px; }
-        .pdf-header h1 { font-family: 'Cinzel', serif; color: var(--rosa-fuerte); margin: 0; font-size: 28px; letter-spacing: 5px; font-weight: 700; }
+        .pdf-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid var(--rosa-fuerte); padding-bottom: 10px; }
+        .pdf-header h1 { font-family: 'Cinzel', serif; color: var(--rosa-fuerte); margin: 0; font-size: 32px; letter-spacing: 5px; }
         
-        .pdf-section-title { font-family: 'Cinzel', serif; color: var(--blanco); background: var(--rosa-fuerte); margin: 10px 0 8px; font-size: 13px; padding: 6px 15px; border-radius: 5px; text-align: center; }
-        .pdf-text { font-size: 13.5px; line-height: 1.5; text-align: justify; }
+        .pdf-section-title { font-family: 'Cinzel', serif; color: white; background: var(--rosa-fuerte); margin: 15px 0 10px; font-size: 14px; padding: 8px; border-radius: 5px; text-align: center; }
+        .pdf-text { font-size: 14px; line-height: 1.6; text-align: justify; }
         .negrita { font-weight: 700; color: var(--rosa-fuerte); }
-        .mini-title { font-weight: 700; color: var(--oro); display: block; margin-top: 8px; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--oro); width: fit-content; }
 
-        .photo-frame { width: 110mm; height: 55mm; margin: 10px auto; border: 2px solid var(--oro); overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .photo-frame { width: 120mm; height: 60mm; margin: 15px auto; border: 2px solid var(--oro); display: flex; align-items: center; justify-content: center; background: white; }
         .photo-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .biometros-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .img-box-pdf { width: 100%; height: 48mm; border: 1px solid var(--oro); object-fit: contain; background: white; }
+        .biometros-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .img-box-pdf { width: 100%; height: 50mm; border: 1px solid var(--oro); object-fit: contain; background: white; }
 
-        .chakras-list-pdf { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; margin-top: 10px; }
-        .chakra-item { border-left: 3px solid var(--rosa-fuerte); padding-left: 8px; background: rgba(255,255,255,0.4); padding: 4px; }
-
-        .footer-sig { text-align: center; margin-top: auto; border-top: 1px solid var(--oro); padding-top: 10px; }
-        .sig-name { font-family: 'Great Vibes', cursive; font-size: 40px; color: var(--rosa-fuerte); margin: 0; }
+        .footer-sig { text-align: center; margin-top: auto; border-top: 1px solid var(--oro); padding-top: 15px; }
+        .sig-name { font-family: 'Great Vibes', cursive; font-size: 45px; color: var(--rosa-fuerte); margin: 0; }
     </style>
 </head>
 <body>
 
 <div class="admin-panel">
-    <h2 style="font-family: 'Cinzel'; text-align: center; color: var(--rosa-fuerte);">Sanación 11.11 - Generador Premium v3.8</h2>
+    <h2 style="font-family: 'Cinzel'; text-align: center; color: var(--rosa-fuerte);">Sanación 11.11 - Generador de Reportes</h2>
     <div class="grid">
-        <div><label>Consultante</label><input id="nombre" value="Gloria Estefania Villalonga"></div>
+        <div><label>Nombre Consultante</label><input id="nombre" value="Gloria Estefania Villalonga"></div>
         <div><label>Fecha de Nacimiento</label><input id="fecha" value="06/03/1993"></div>
         <div><label>Foto Cartas</label><input type="file" accept="image/*" onchange="loadImg(event, 'outFotoCartas')"></div>
-        <div><label>2 Fotos Biómetros</label><input type="file" accept="image/*" multiple onchange="loadMultipleImgs(event, 'gridBiometros', 2)"></div>
-        <div><label>2 Fotos Chakras</label><input type="file" accept="image/*" multiple onchange="loadMultipleImgs(event, 'gridChakrasImg', 2)"></div>
+        <div><label>Fotos Biómetros (Selecciona 2)</label><input type="file" accept="image/*" multiple onchange="loadMultipleImgs(event, 'gridBiometros', 2)"></div>
+        <div><label>Fotos Chakras (Selecciona 2)</label><input type="file" accept="image/*" multiple onchange="loadMultipleImgs(event, 'gridChakrasImg', 2)"></div>
         <div><label>Foto Cruz de Ankh</label><input type="file" accept="image/*" onchange="loadImg(event, 'outFotoAnkh')"></div>
-        <div><label>Bovis Inicial</label><input id="bIni" value="2.900"></div>
-        <div><label>Bovis Final</label><input id="bFin" value="45.000"></div>
-        <div style="grid-column: span 2;"><label>Síntesis Evolutiva</label><textarea id="out_sin" rows="3">Durante el proceso se identificaron focos de desgaste que no siempre son evidentes...</textarea></div>
-        <div style="grid-column: span 2;"><label>Recomendación</label><textarea id="out_rec" rows="2">Protocolo de Sellado: Realizar durante 3 días un baño con sal gruesa y hojas de laurel.</textarea></div>
-        <div style="display: none;">
-            <input type="checkbox" id="chk_ag" checked><input type="checkbox" id="chk_mo" checked>
-            <input type="checkbox" id="chk_en" checked><input type="checkbox" id="chk_mps" checked>
-            <input type="checkbox" id="chk_mri"><input type="checkbox" id="chk_de" checked>
-            <input type="checkbox" id="chk_ei" checked><input type="checkbox" id="chk_ba" checked>
-        </div>
+        <div><label>Unidades Bovis Inicial</label><input id="bIni" value="2.900"></div>
+        <div><label>Unidades Bovis Final</label><input id="bFin" value="45.000"></div>
+        <div style="grid-column: span 2;"><label>Síntesis Evolutiva</label><textarea id="out_sin" rows="4">Durante el proceso se identificaron focos de desgaste...</textarea></div>
+        <div style="grid-column: span 2;"><label>Recomendaciones</label><textarea id="out_rec" rows="3">Realizar durante 3 días un baño con sal gruesa y hojas de laurel...</textarea></div>
     </div>
-    <button class="btn-magic" onclick="renderPDF()">GENERAR REPORTE CON FONDO PREMIUM</button>
+    
+    <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+        <label><input type="checkbox" id="chk_ag" checked> Agresiones</label>
+        <label><input type="checkbox" id="chk_mo" checked> Mal de Ojo</label>
+        <label><input type="checkbox" id="chk_en" checked> Envidia</label>
+        <label><input type="checkbox" id="chk_mps" checked> Magia Psíquica</label>
+        <label><input type="checkbox" id="chk_mri"> Magia Ritual</label>
+        <label><input type="checkbox" id="chk_de" checked> Desencarnados</label>
+        <label><input type="checkbox" id="chk_ei" checked> Espíritu Invasor</label>
+        <label><input type="checkbox" id="chk_ba" checked> Bajo Astral</label>
+    </div>
+
+    <button class="btn-magic" onclick="renderPDF()">GENERAR REPORTE PDF</button>
 </div>
 
+<!-- AREA DE RENDERIZADO (OCULTA) -->
 <div id="pdf-render-area">
-    <!-- REPETIR ESTA ESTRUCTURA PARA CADA PÁGINA -->
     <div class="pdf-page" id="hoja1">
         <div class="pdf-background"></div>
         <div class="inner-border">
-            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Lectura Evolutiva</p></div>
+            <div class="pdf-header"><h1>SANACIÓN 11.11</h1><p>Lectura de Energías</p></div>
             <div class="pdf-text">
                 <p><span class="negrita">Consultante:</span> <span id="p1_nombre"></span></p>
                 <p><span class="negrita">Fecha:</span> <span id="p1_fecha"></span></p>
-                <span class="mini-title">La Energía Base</span>
-                <p>Representa el clima general de la consulta y la energía principal que envuelve tu proceso actual. Indica qué aspectos de tu ser están listos para ser trabajados y qué fuerzas te acompañan en este momento.</p>
-                <span class="mini-title">Interpretación</span>
-                <p>Las cartas nos permiten mapear tu presente y futuro inmediato, identificando bloqueos en la Rueda Zodiacal para transformarlos en oportunidades de crecimiento.</p>
+                <div class="pdf-section-title">ORÁCULO Y ENERGÍA BASE</div>
+                <p>Las cartas nos permiten mapear tu presente y futuro inmediato, identificando bloqueos para transformarlos en oportunidades de crecimiento. Representa el clima general de la consulta y la energía principal que envuelve tu proceso actual.</p>
             </div>
             <div class="photo-frame"><img id="outFotoCartas"></div>
         </div>
@@ -120,13 +102,13 @@
     <div class="pdf-page" id="hoja2">
         <div class="pdf-background"></div>
         <div class="inner-border">
-            <div class="pdf-header"><h1>PÉNDULO KARNAK</h1><p>Transmutación Radiónica</p></div>
-            <div style="display: flex; justify-content: space-around; background: var(--rosa-fuerte); color: white; padding: 10px; border-radius: 8px; margin: 10px 0;">
-                <div style="text-align: center;"><small>INICIAL</small><br><b id="p2_bini" style="font-size: 22px;"></b></div>
-                <div style="text-align: center;"><small>FINAL (RECALIBRADO)</small><br><b id="p2_bfin" style="font-size: 22px;"></b></div>
+            <div class="pdf-header"><h1>PÉNDULO KARNAK</h1><p>Sanación Radiónica</p></div>
+            <div style="display: flex; justify-content: space-around; background: var(--rosa-fuerte); color: white; padding: 15px; border-radius: 10px;">
+                <div style="text-align: center;">BOVIS INICIAL<br><b id="p2_bini" style="font-size: 20px;"></b></div>
+                <div style="text-align: center;">BOVIS FINAL<br><b id="p2_bfin" style="font-size: 20px;"></b></div>
             </div>
-            <div class="pdf-section-title">DESBLOQUEOS REALIZADOS</div>
-            <div id="p2_glosario" class="pdf-text" style="font-size: 11.5px;"></div>
+            <div class="pdf-section-title">DESBLOQUEOS Y LIMPIEZA</div>
+            <div id="p2_glosario" class="pdf-text" style="font-size: 12px;"></div>
             <div class="biometros-grid" id="gridBiometros"></div>
         </div>
     </div>
@@ -134,22 +116,21 @@
     <div class="pdf-page" id="hoja3">
         <div class="pdf-background"></div>
         <div class="inner-border">
-            <div class="pdf-header"><h1>CENTROS DE ENERGÍA</h1><p>Alineación de Chakras</p></div>
+            <div class="pdf-header"><h1>CHAKRAS</h1><p>Alineación y Balance</p></div>
             <div class="biometros-grid" id="gridChakrasImg"></div>
-            <div class="pdf-section-title">CHAKRAS RECALIBRADOS</div>
-            <div class="chakras-list-pdf" id="p3_chakras_list"></div>
+            <div class="pdf-section-title">ESTADO DE CENTROS ENERGÉTICOS</div>
+            <div class="pdf-text" id="p3_chakras_text">
+                <p><b>Corona:</b> Conexión espiritual. | <b>Tercer Ojo:</b> Intuición. | <b>Laríngeo:</b> Comunicación. | <b>Corazón:</b> Sentimientos. | <b>Plexo Solar:</b> Emociones. | <b>Sacro:</b> Creatividad. | <b>Raíz:</b> Estabilidad.</p>
+            </div>
         </div>
     </div>
 
     <div class="pdf-page" id="hoja4">
         <div class="pdf-background"></div>
         <div class="inner-border">
-            <div class="pdf-header"><h1>CRUZ DE ANKH</h1><p>La Llave de la Vida</p></div>
-            <div class="pdf-text">
-                <p>Efectuamos una limpieza profunda del campo áurico, el corte de lazos energéticos que drenaban tu vitalidad y el sellado del campo electromagnético para restaurar tu flujo sagrado. La Cruz de Ankh actúa como un resonador de alta frecuencia que protege tu soberanía energética.</p>
-            </div>
+            <div class="pdf-header"><h1>CRUZ DE ANKH</h1><p>Protección Sagrada</p></div>
+            <p class="pdf-text">La Cruz de Ankh actúa como un resonador de alta frecuencia que protege tu soberanía energética, sellando el campo electromagnético y cortando lazos que drenan vitalidad.</p>
             <div class="photo-frame" style="height: 80mm;"><img id="outFotoAnkh"></div>
-            <p style="text-align: center; color: var(--rosa-fuerte); font-style: italic; margin-top: 20px;">"Donde hay vida, hay luz. Donde hay luz, hay libertad."</p>
         </div>
     </div>
 
@@ -157,19 +138,20 @@
         <div class="pdf-background"></div>
         <div class="inner-border">
             <div class="pdf-header"><h1>INTEGRACIÓN</h1><p>Mensaje Final</p></div>
-            <div class="pdf-section-title">SÍNTESIS DE TU PROCESO</div>
-            <div id="p5_sin" class="pdf-text" style="background: rgba(255,245,248,0.8); padding: 20px; border-radius: 12px; font-style: italic; border: 1px dashed var(--rosa-fuerte);"></div>
+            <div class="pdf-section-title">SÍNTESIS EVOLUTIVA</div>
+            <div id="p5_sin" class="pdf-text" style="font-style: italic;"></div>
             <div class="pdf-section-title" style="background: var(--oro);">RECOMENDACIONES</div>
-            <div id="p5_rec" class="pdf-text" style="font-weight: 600; text-align: center; margin-top: 15px; font-size: 15px;"></div>
+            <div id="p5_rec" class="pdf-text" style="font-weight: 600; border: 2px dashed var(--rosa-fuerte); padding: 15px;"></div>
             <div class="footer-sig">
                 <p class="sig-name">Clara</p>
-                <p style="font-size: 14px; font-weight: bold; color: var(--rosa-fuerte); margin: 0;">Sanación 11.11 | Mar del Plata</p>
+                <p style="font-weight: bold; color: var(--rosa-fuerte);">Sanación 11.11 | Mar del Plata</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+// FUNCIONES DE CARGA DE IMAGEN
 function loadImg(e, id) {
     const reader = new FileReader();
     reader.onload = () => { document.getElementById(id).src = reader.result; }
@@ -192,70 +174,51 @@ function loadMultipleImgs(e, containerId, max) {
     }
 }
 
-const DESCRIPCIONES = {
-    chk_ag: ["Agresiones Psicodinámicas", "Conflictos internos o autoataques energéticos."],
-    chk_mo: ["Mal de Ojo", "Carga negativa proyectada por terceros."],
-    chk_en: ["Envidia", "Frecuencias densas que actúan como lastre."],
-    chk_mps: ["Magia Psíquica", "Influencias mentales ajenas."],
-    chk_de: ["Desencarnados", "Almas no trascendidas adheridas al campo."],
-    chk_ei: ["Espíritu Invasor", "Entidad externa que nubla la intuición."],
-    chk_ba: ["Bajo Astral", "Frecuencias de miedo o ira."]
+// TEXTOS DE GLOSARIO
+const GLOSARIO = {
+    chk_ag: "<b>Agresiones Psicodinámicas:</b> Conflictos internos o autoataques energéticos que debilitan el aura.",
+    chk_mo: "<b>Mal de Ojo:</b> Energía negativa proyectada de forma consciente o inconsciente por otros.",
+    chk_en: "<b>Envidia:</b> Frecuencias de baja vibración que actúan como lastre en tus proyectos.",
+    chk_mps: "<b>Magia Psíquica:</b> Influencias mentales o pensamientos obsesivos ajenos.",
+    chk_mri: "<b>Magia Ritual:</b> Intervenciones energéticas externas de carácter ritual.",
+    chk_de: "<b>Desencarnados:</b> Almas o energías no trascendidas adheridas al campo vital.",
+    chk_ei: "<b>Espíritu Invasor:</b> Entidades que parasitan la energía y nublan la claridad mental.",
+    chk_ba: "<b>Bajo Astral:</b> Frecuencias densas relacionadas con el miedo o la angustia."
 };
 
-const CHAKRAS_DATA = [
-    { name: "Corona", desc: "Conexión cósmica." },
-    { name: "Tercer Ojo", desc: "Intuición clara." },
-    { name: "Laríngeo", desc: "Verdad personal." },
-    { name: "Corazón", desc: "Amor y equilibrio." },
-    { name: "Plexo Solar", desc: "Poder y voluntad." },
-    { name: "Sacro", desc: "Creatividad." },
-    { name: "Raíz", desc: "Seguridad y anclaje." },
-    { name: "Timo", desc: "Paz universal." }
-];
-
 async function renderPDF() {
-    try {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        document.getElementById("p1_nombre").innerText = document.getElementById("nombre").value;
-        document.getElementById("p1_fecha").innerText = document.getElementById("fecha").value;
-        document.getElementById("p2_bini").innerText = document.getElementById("bIni").value;
-        document.getElementById("p2_bfin").innerText = document.getElementById("bFin").value;
-        document.getElementById("p5_sin").innerText = document.getElementById("out_sin").value;
-        document.getElementById("p5_rec").innerText = "✨ " + document.getElementById("out_rec").value;
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const button = document.querySelector(".btn-magic");
+    button.innerText = "PROCESANDO...";
 
-        let glosHTML = "";
-        for(let id in DESCRIPCIONES) {
-            if(document.getElementById(id).checked) {
-                glosHTML += `<p style="margin-bottom:4px"><b>${DESCRIPCIONES[id][0]}:</b> ${DESCRIPCIONES[id][1]}</p>`;
-            }
-        }
-        document.getElementById("p2_glosario").innerHTML = glosHTML;
+    // Pasar datos de inputs al área de render
+    document.getElementById("p1_nombre").innerText = document.getElementById("nombre").value;
+    document.getElementById("p1_fecha").innerText = document.getElementById("fecha").value;
+    document.getElementById("p2_bini").innerText = document.getElementById("bIni").value;
+    document.getElementById("p2_bfin").innerText = document.getElementById("bFin").value;
+    document.getElementById("p5_sin").innerText = document.getElementById("out_sin").value;
+    document.getElementById("p5_rec").innerText = document.getElementById("out_rec").value;
 
-        let chkHTML = "";
-        CHAKRAS_DATA.forEach(ch => {
-            chkHTML += `<div class="chakra-item"><b>${ch.name}:</b> ${ch.desc}</div>`;
-        });
-        document.getElementById("p3_chakras_list").innerHTML = chkHTML;
+    // Generar glosario seleccionado
+    let gHTML = "";
+    Object.keys(GLOSARIO).forEach(id => {
+        if(document.getElementById(id).checked) gHTML += `<p style="margin-bottom:5px">${GLOSARIO[id]}</p>`;
+    });
+    document.getElementById("p2_glosario").innerHTML = gHTML;
 
-        const hojas = ["hoja1", "hoja2", "hoja3", "hoja4", "hoja5"];
-        for(let i=0; i<hojas.length; i++) {
-            const canvas = await html2canvas(document.getElementById(hojas[i]), { 
-                scale: 2,
-                useCORS: true,
-                allowTaint: true
-            });
-            const img = canvas.toDataURL('image/jpeg', 0.95);
-            if(i > 0) pdf.addPage();
-            pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
-        }
-        
-        pdf.save(`Reporte_Sanacion1111_${document.getElementById("nombre").value}.pdf`);
-    } catch (e) {
-        console.error(e);
-        alert("Error al generar PDF.");
+    const hojas = ["hoja1", "hoja2", "hoja3", "hoja4", "hoja5"];
+    
+    for(let i=0; i<hojas.length; i++) {
+        const element = document.getElementById(hojas[i]);
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        if(i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
     }
+
+    pdf.save(`Reporte_Sanacion_${document.getElementById("nombre").value}.pdf`);
+    button.innerText = "GENERAR REPORTE PDF";
 }
 </script>
 </body>
